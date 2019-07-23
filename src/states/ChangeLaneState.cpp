@@ -1,5 +1,6 @@
 #include "ChangeLaneState.h"
 #include "../spline.h"
+#include <iostream>
 
 ChangeLaneState::ChangeLaneState(ChangeLaneState::LaneDirection direction,
                                  int num_lanes, double lane_width,
@@ -37,7 +38,8 @@ std::vector<VehiclePosition> ChangeLaneState::generateTrajectory(
 
     double sPos = next_pos.getS() + newV * m_point_interval;
     next_pos = VehiclePosition(sPos, s(sPos), newV);
-    dist = next_pos.getS() - trajectory.back().getS();
+    dist = next_pos.getS() - current_state.getS();
+    std::cout << "dist " << dist << std::endl;
   }
   return trajectory;
 }

@@ -30,7 +30,7 @@ std::vector<VehiclePosition> ChangeSpeedState::generateTrajectory(const VehicleP
         newV = std::min(m_speed_limit, next_pos.getSpeed() + m_acceleration * m_point_interval);
         double sPos = next_pos.getS() + newV * m_point_interval;
         next_pos = VehiclePosition(sPos, s(sPos), newV);
-        dist = next_pos.getS() - trajectory.back().getS();
+        dist = next_pos.getS() - current_state.getS();
     }
     return trajectory;
 }
