@@ -3,6 +3,7 @@
 #include "states/ChangeSpeedState.h"
 #include "cost_functions/SpeedEfficiencyCost.h"
 #include "cost_functions/SpeedLimitCost.h"
+#include <iostream>
 
 static const double SAFETY_WEIGHT = 1000;
 static const double EFFITIENCY_COST = 100;
@@ -12,16 +13,16 @@ TrajectoryGenerator::TrajectoryGenerator(const RoadOptions &roadOptions)
   // init all the possible states
   std::unique_ptr<ChangeLaneState> move_right_lane(new ChangeLaneState(
       ChangeLaneState::DIR_RIGHT, m_road_options.lane_number,
-      m_road_options.lane_width));
+      m_road_options.lane_width, m_road_options.speed_limit, 5));
   std::unique_ptr<ChangeLaneState> move_left_lane(
       new ChangeLaneState(ChangeLaneState::DIR_LEFT, m_road_options.lane_number,
-                          m_road_options.lane_width));
+                          m_road_options.lane_width, m_road_options.speed_limit, 5));
   std::unique_ptr<ChangeSpeedState> increase_speed(
-      new ChangeSpeedState(0.12, m_road_options.speed_limit));
+      new ChangeSpeedState( m_road_options.lane_width, 5, m_road_options.speed_limit));
   std::unique_ptr<ChangeSpeedState> decrease_speed(
-      new ChangeSpeedState(-0.12, m_road_options.speed_limit));
+      new ChangeSpeedState( m_road_options.lane_width, -5, m_road_options.speed_limit));
   std::unique_ptr<ChangeSpeedState> keep_lane(
-      new ChangeSpeedState(-0.12, m_road_options.speed_limit));
+      new ChangeSpeedState( m_road_options.lane_width, 0, m_road_options.speed_limit));
   m_states.push_back(std::move(move_right_lane));
   m_states.push_back(std::move(move_left_lane));
   m_states.push_back(std::move(increase_speed));
@@ -45,6 +46,7 @@ std::vector<VehiclePosition> TrajectoryGenerator::generate_trajectory(
   const VehiclePosition &current_state = previousTrajectory.back();
   for (const auto &state : m_states) {
     if (state->isStatePossible(current_state)) {
+      std::cout << "build trajectory for state " << state->getName() << std::endl;
       possible_trajectories.push_back(state->generateTrajectory(current_state));
     }
   }

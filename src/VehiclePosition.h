@@ -9,7 +9,9 @@ class VehiclePosition {
 public:
   VehiclePosition(double s, double d, double speed);
 
-  const Coords &getCoords() const;
+  const double &getS() const;
+
+  const double &getD() const;
 
   double getYaw() const;
 

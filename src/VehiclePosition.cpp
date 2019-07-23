@@ -9,10 +9,17 @@ VehiclePosition::VehiclePosition(double s, double d, double speed)
 }
 
 
-const Coords& VehiclePosition::getCoords() const
+const double& VehiclePosition::getS() const
 {
-    return m_frenet;
+    return m_frenet.first;
 }
+
+
+const double& VehiclePosition::getD() const
+{
+    return m_frenet.second;
+}
+
 
 double VehiclePosition::getYaw() const
 {

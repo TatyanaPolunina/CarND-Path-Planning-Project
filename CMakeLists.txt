@@ -13,6 +13,7 @@ set(sources
     src/TrajectoryGenerator.cpp
     src/cost_functions/SpeedLimitCost.cpp
     src/cost_functions/SpeedEfficiencyCost.cpp
+    src/states/State.cpp
     src/states/ChangeSpeedState.cpp
     src/states/ChangeLaneState.cpp
     )

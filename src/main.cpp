@@ -23,6 +23,7 @@ int main() {
   vector<double> map_waypoints_s;
   vector<double> map_waypoints_dx;
   vector<double> map_waypoints_dy;
+  TrajectoryGenerator generator({4, 3.0, 50.0});
 
   // Waypoint map to read from
   string map_file_ = "../data/highway_map.csv";
@@ -52,7 +53,7 @@ int main() {
   }
 
   h.onMessage([&map_waypoints_x,&map_waypoints_y,&map_waypoints_s,
-               &map_waypoints_dx,&map_waypoints_dy]
+               &map_waypoints_dx,&map_waypoints_dy, &generator]
               (uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
                uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
@@ -89,10 +90,36 @@ int main() {
           //   of the road.
           auto sensor_fusion = j[1]["sensor_fusion"];
 
-          json msgJson;
+          VehiclePosition current_position(car_s, car_d, car_speed);
+          current_position.setYaw(car_yaw);
+
+          std::vector<VehiclePosition> other_vehicles;
+
+          for (const auto& sensor:sensor_fusion)
+          {
+              double vx = sensor[3];
+              double vy = sensor[4];
+              double check_speed = sqrt(vx*vx+vy*vy);
+              other_vehicles.emplace_back(sensor[5], sensor[6], check_speed);
+          }
+
+
+          std::cout << "current position " << current_position.getS() << std::endl;
+          const auto trajectory = generator.generate_trajectory({current_position}, other_vehicles );
 
           vector<double> next_x_vals;
           vector<double> next_y_vals;
+
+          for (const auto& vehiclePosition:trajectory)
+          {
+             auto xy = getXY(vehiclePosition.getS(), vehiclePosition.getD(), map_waypoints_s, map_waypoints_x, map_waypoints_y);
+             next_x_vals.push_back(xy[0]);
+             next_y_vals.push_back(xy[1]);
+          }
+
+          json msgJson;
+
+
 
           /**
            * TODO: define a path made up of (x,y) points that the car will visit
