@@ -41,7 +41,7 @@ bool ChangeSpeedState::isStatePossible(const VehiclePosition &current_state) con
 
   double new_speed = current_state.getSpeed() + m_acceleration * m_point_interval;
   std::cout << "change speed possible" << new_speed << std::endl;
-  return new_speed <= m_speed_limit && new_speed >= 0;
+  return new_speed <= m_speed_limit && new_speed >= 0 && new_speed > 0;
 }
 
 

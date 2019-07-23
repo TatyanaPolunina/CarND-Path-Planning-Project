@@ -48,7 +48,7 @@ bool ChangeLaneState::isStatePossible(
     const VehiclePosition &current_state) const {
   int direction = (m_direction == DIR_RIGHT) ? 1 : -1;
   int new_lane = getCurrentLane(current_state.getD()) + direction;
-  return new_lane >= 0 && new_lane < m_num_lanes;
+  return new_lane >= 0 && new_lane < m_num_lanes && current_state.getSpeed() > 0;
 }
 
 
