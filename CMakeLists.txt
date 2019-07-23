@@ -10,7 +10,11 @@ set(CMAKE_CXX_FLAGS, "${CXX_FLAGS}")
 set(sources
     src/main.cpp
     src/VehiclePosition.cpp
+    src/TrajectoryGenerator.cpp
     src/cost_functions/SpeedLimitCost.cpp
+    src/cost_functions/SpeedEfficiencyCost.cpp
+    src/states/ChangeSpeedState.cpp
+    src/states/ChangeLaneState.cpp
     )
 
 

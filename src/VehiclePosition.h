@@ -7,13 +7,9 @@ using Coords = std::pair<double, double>;
 
 class VehiclePosition {
 public:
-  VehiclePosition(double x, double y, double s, double d);
-
-  VehiclePosition(double x, double y);
+  VehiclePosition(double s, double d, double speed);
 
   const Coords &getCoords() const;
-
-  const Coords &getFrenet() const;
 
   double getYaw() const;
 
@@ -24,7 +20,6 @@ public:
   void setYaw(double yaw);
 
 private:
-  Coords m_cartesian;
   Coords m_frenet;
   double m_speed;
   double m_yaw;

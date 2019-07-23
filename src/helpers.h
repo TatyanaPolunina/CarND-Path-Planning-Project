@@ -59,7 +59,8 @@ int ClosestWaypoint(double x, double y, const vector<double> &maps_x,
 }
 
 // Returns next waypoint of the closest waypoint
-int NextWaypoint(double x, double y, double theta, const vector<double> &maps_x, 
+
+static int NextWaypoint(double x, double y, double theta, const vector<double> &maps_x,
                  const vector<double> &maps_y) {
   int closestWaypoint = ClosestWaypoint(x,y,maps_x,maps_y);
 
@@ -82,7 +83,8 @@ int NextWaypoint(double x, double y, double theta, const vector<double> &maps_x,
 }
 
 // Transform from Cartesian x,y coordinates to Frenet s,d coordinates
-vector<double> getFrenet(double x, double y, double theta, 
+
+static vector<double> getFrenet(double x, double y, double theta,
                          const vector<double> &maps_x, 
                          const vector<double> &maps_y) {
   int next_wp = NextWaypoint(x,y, theta, maps_x,maps_y);
@@ -127,7 +129,7 @@ vector<double> getFrenet(double x, double y, double theta,
 }
 
 // Transform from Frenet s,d coordinates to Cartesian x,y
-vector<double> getXY(double s, double d, const vector<double> &maps_s, 
+static vector<double> getXY(double s, double d, const vector<double> &maps_s,
                      const vector<double> &maps_x, 
                      const vector<double> &maps_y) {
   int prev_wp = -1;

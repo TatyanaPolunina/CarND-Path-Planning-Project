@@ -10,7 +10,7 @@ public:
 
     double calculateCost(const VehiclePosition &currentState,
                          const VehiclePosition &nextState,
-                         const std::vector<VehiclePosition> &otherVehicles) override;
+                         const std::vector<VehiclePosition> &otherVehicles) const override;
 private:
     double m_limit;
 };

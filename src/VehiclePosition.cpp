@@ -1,20 +1,15 @@
 #include "VehiclePosition.h"
 
-VehiclePosition::VehiclePosition(double x, double y, double s, double d)
-    : m_cartesian(x,y)
-    , m_frenet(s,d)
-    , m_speed(0)
+VehiclePosition::VehiclePosition(double s, double d, double speed)
+    : m_frenet(s,d)
+    , m_speed(speed)
     , m_yaw(0)
 {
 
 }
 
-const Coords& VehiclePosition::getCoords() const
-{
-    return  m_cartesian;
-}
 
-const Coords& VehiclePosition::getFrenet() const
+const Coords& VehiclePosition::getCoords() const
 {
     return m_frenet;
 }
