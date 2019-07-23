@@ -1,5 +1,4 @@
 #include "ChangeSpeedState.h"
-#include "../spline.h"
 #include <iostream>
 
 ChangeSpeedState::ChangeSpeedState(double lane_width, double acceleration, double speed_limit)
@@ -12,16 +11,15 @@ ChangeSpeedState::ChangeSpeedState(double lane_width, double acceleration, doubl
 
 std::vector<VehiclePosition> ChangeSpeedState::generateTrajectory(const VehiclePosition &current_state) const
 {
-    tk::spline s;
-    std::vector<double> s_points({current_state.getS(), current_state.getS() + m_trajectory_dist});
-    std::vector<double> d_points({current_state.getD(), getLaneCenter(getCurrentLane(current_state.getD()))});
-    s.set_points(s_points, d_points);
 
     double newV = current_state.getSpeed() + m_acceleration * m_point_interval;
     double sPos = current_state.getS() + newV * m_point_interval;
+    double dist = sPos - current_state.getS();
+    double lane_center = getLaneCenter(getCurrentLane(sPos));
+    double dPos = current_state.getD() + dist/m_trajectory_dist * (lane_center - current_state.getD());
 
-    VehiclePosition next_pos(sPos, s(sPos), newV);
-    double dist = next_pos.getS() - current_state.getS();
+    VehiclePosition next_pos(sPos, dPos, newV);
+
     std::vector<VehiclePosition> trajectory;
     while (dist < m_trajectory_dist)
     {
@@ -29,8 +27,10 @@ std::vector<VehiclePosition> ChangeSpeedState::generateTrajectory(const VehicleP
         std::cout << next_pos.getS() << ' ' << next_pos.getD() << std::endl;
         newV = std::min(m_speed_limit, next_pos.getSpeed() + m_acceleration * m_point_interval);
         double sPos = next_pos.getS() + newV * m_point_interval;
-        next_pos = VehiclePosition(sPos, s(sPos), newV);
         dist = next_pos.getS() - current_state.getS();
+        dPos = current_state.getD() + dist/m_trajectory_dist * (lane_center - current_state.getD());
+        next_pos = VehiclePosition(sPos, dPos, newV);
+
     }
     return trajectory;
 }
