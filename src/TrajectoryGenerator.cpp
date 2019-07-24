@@ -27,7 +27,7 @@ TrajectoryGenerator::TrajectoryGenerator(const RoadOptions &roadOptions)
   //m_states.push_back(std::move(move_left_lane));
   m_states.push_back(std::move(increase_speed));
   //m_states.push_back(std::move(decrease_speed));
-  m_states.push_back(std::move(keep_lane));
+  //m_states.push_back(std::move(keep_lane));
 
   std::unique_ptr<SpeedEfficiencyCost> speed_efficiency(
       new SpeedEfficiencyCost(m_road_options.speed_limit));
@@ -46,7 +46,7 @@ std::vector<VehiclePosition> TrajectoryGenerator::generate_trajectory(
   const VehiclePosition &current_state = previousTrajectory.back();
   for (const auto &state : m_states) {
     if (state->isStatePossible(current_state)) {
-      std::cout << "build trajectory for state " << state->getName() << std::endl;
+      //std::cout << "build trajectory for state " << state->getName() << std::endl;
       possible_trajectories.push_back(state->generateTrajectory(current_state));
     }
   }

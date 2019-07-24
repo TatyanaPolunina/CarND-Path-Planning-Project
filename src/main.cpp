@@ -23,7 +23,7 @@ int main() {
   vector<double> map_waypoints_s;
   vector<double> map_waypoints_dx;
   vector<double> map_waypoints_dy;
-  TrajectoryGenerator generator({4, 3.0, 50.0});
+  TrajectoryGenerator generator({4, 3.0, 49 / 2.237});
 
   // Waypoint map to read from
   string map_file_ = "../data/highway_map.csv";
@@ -96,9 +96,13 @@ int main() {
             double ref_x = previous_path_x[prev_size-1];
             double ref_x_prev = previous_path_x[prev_size-2];
             double ref_y = previous_path_y[prev_size-1];
-			double ref_y_prev = previous_path_y[prev_size-2];
+            double ref_y_prev = previous_path_y[prev_size-2];
             car_speed = (sqrt((ref_x-ref_x_prev)*(ref_x-ref_x_prev)+(ref_y-ref_y_prev)*(ref_y-ref_y_prev))/.02);
-//            std::cout << "speed " << car_speed << std::endl;
+            auto sd = getFrenet(ref_x, ref_y, car_yaw, map_waypoints_x, map_waypoints_y);
+            end_path_s = sd[0];
+            end_path_d = sd[1];
+           // std::cout << "s " << sd[0] << "d " << sd[1] << std::endl;
+           // std::cout << "last " << end_path_s << " " << end_path_d << std::endl;
           } 
           else
           {
@@ -106,7 +110,7 @@ int main() {
              end_path_d = car_d;
           }
           
-          std::cout << "speed " << car_speed << std::endl;
+          std::cout << "speed " << car_speed * 2.237 << std::endl;
   
           VehiclePosition current_position(end_path_s, end_path_d, car_speed);
           std::cout << "end  " << end_path_s << ' ' << end_path_d << std::endl;
@@ -139,20 +143,15 @@ int main() {
 
             for (const auto& vehiclePosition:trajectory)
             {
+               if (next_x_vals.size() == 50)
+                 break;
                auto xy = getXY(vehiclePosition.getS(), vehiclePosition.getD(), map_waypoints_s, map_waypoints_x, map_waypoints_y);
-               std::cout << " x " << xy[0] << " y " << xy[1] << std::endl;
                next_x_vals.push_back(xy[0]);
                next_y_vals.push_back(xy[1]);
             }
-
             std::cout << "next size " <<next_x_vals.size() <<std::endl;
           }
           json msgJson;
-
-          /**
-           * TODO: define a path made up of (x,y) points that the car will visit
-           *   sequentially every .02 seconds
-           */
 
           msgJson["next_x"] = next_x_vals;
           msgJson["next_y"] = next_y_vals;
