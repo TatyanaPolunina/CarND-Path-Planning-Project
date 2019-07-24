@@ -5,14 +5,14 @@
 
 class SpeedEfficiencyCost : public CostFunction {
 public:
-  SpeedEfficiencyCost(int speed_limit);
+  SpeedEfficiencyCost(double speed_limit);
 
   double calculateCost(
       const VehiclePosition &currentState, const VehiclePosition &nextState,
       const std::vector<VehiclePosition> &otherVehicles) const override;
 
 private:
-  int m_speed_limit;
+  double m_speed_limit;
 
 };
 

@@ -12,7 +12,7 @@ ChangeSpeedState::ChangeSpeedState(double lane_width, double acceleration, doubl
 std::vector<VehiclePosition> ChangeSpeedState::generateTrajectory(const VehiclePosition &current_state) const
 {
 
-    double newV = current_state.getSpeed() + m_acceleration * m_point_interval;
+    double newV = current_state.getSpeed()/2.237 + m_acceleration * m_point_interval;
     double sPos = current_state.getS() + newV * m_point_interval;
     double dist = sPos - current_state.getS();
     double lane_center = getLaneCenter(getCurrentLane(sPos));
@@ -25,7 +25,7 @@ std::vector<VehiclePosition> ChangeSpeedState::generateTrajectory(const VehicleP
     {
         trajectory.push_back(next_pos);
         std::cout << next_pos.getS() << ' ' << next_pos.getD() << std::endl;
-        newV = std::min(m_speed_limit, next_pos.getSpeed() + m_acceleration * m_point_interval);
+        newV = std::min(m_speed_limit/2.237, next_pos.getSpeed() + m_acceleration * m_point_interval);
         double sPos = next_pos.getS() + newV * m_point_interval;
         dist = next_pos.getS() - current_state.getS();
         dPos = current_state.getD() + dist/m_trajectory_dist * (lane_center - current_state.getD());

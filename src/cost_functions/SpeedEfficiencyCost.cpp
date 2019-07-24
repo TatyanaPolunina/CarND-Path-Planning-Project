@@ -1,6 +1,6 @@
 #include "SpeedEfficiencyCost.h"
 
-SpeedEfficiencyCost::SpeedEfficiencyCost(int speed_limit)
+SpeedEfficiencyCost::SpeedEfficiencyCost(double speed_limit)
     : m_speed_limit(speed_limit)
 {
 
