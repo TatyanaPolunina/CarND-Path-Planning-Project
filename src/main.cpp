@@ -98,8 +98,18 @@ int main() {
             double ref_y = previous_path_y[prev_size-1];
 			double ref_y_prev = previous_path_y[prev_size-2];
             car_speed = (sqrt((ref_x-ref_x_prev)*(ref_x-ref_x_prev)+(ref_y-ref_y_prev)*(ref_y-ref_y_prev))/.02);
+//            std::cout << "speed " << car_speed << std::endl;
+          } 
+          else
+          {
+             end_path_s = car_s;
+             end_path_d = car_d;
           }
-          VehiclePosition current_position(end_path_s, end_path_s, car_speed);
+          
+          std::cout << "speed " << car_speed << std::endl;
+  
+          VehiclePosition current_position(end_path_s, end_path_d, car_speed);
+          std::cout << "end  " << end_path_s << ' ' << end_path_d << std::endl;
           current_position.setYaw(car_yaw);
 
           std::vector<VehiclePosition> other_vehicles;
@@ -112,35 +122,37 @@ int main() {
               other_vehicles.emplace_back(sensor[5], sensor[6], check_speed);
           }
 
-
-          std::cout << "current position " << current_position.getS() << std::endl;
-          const auto trajectory = generator.generate_trajectory({current_position}, other_vehicles );
-
           vector<double> next_x_vals;
           vector<double> next_y_vals;
 
+          std::cout << "prev size " <<previous_path_x.size() <<std::endl;
           for(int i = 0; i < previous_path_x.size(); i++)
           {
              next_x_vals.push_back(previous_path_x[i]);
              next_y_vals.push_back(previous_path_y[i]);
           }
           
-          for (const auto& vehiclePosition:trajectory)
+          if (next_x_vals.size() < 50) 
           {
-             auto xy = getXY(vehiclePosition.getS(), vehiclePosition.getD(), map_waypoints_s, map_waypoints_x, map_waypoints_y);
-             next_x_vals.push_back(xy[0]);
-             next_y_vals.push_back(xy[1]);
+            std::cout << "current position " << current_position.getS() << std::endl;
+            const auto trajectory = generator.generate_trajectory({current_position}, other_vehicles );
+
+            for (const auto& vehiclePosition:trajectory)
+            {
+               auto xy = getXY(vehiclePosition.getS(), vehiclePosition.getD(), map_waypoints_s, map_waypoints_x, map_waypoints_y);
+               std::cout << " x " << xy[0] << " y " << xy[1] << std::endl;
+               next_x_vals.push_back(xy[0]);
+               next_y_vals.push_back(xy[1]);
+            }
+
+            std::cout << "next size " <<next_x_vals.size() <<std::endl;
           }
-
           json msgJson;
-
-
 
           /**
            * TODO: define a path made up of (x,y) points that the car will visit
            *   sequentially every .02 seconds
            */
-
 
           msgJson["next_x"] = next_x_vals;
           msgJson["next_y"] = next_y_vals;

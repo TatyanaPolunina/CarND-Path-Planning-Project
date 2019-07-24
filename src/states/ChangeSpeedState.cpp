@@ -24,7 +24,7 @@ std::vector<VehiclePosition> ChangeSpeedState::generateTrajectory(const VehicleP
     while (dist < m_trajectory_dist)
     {
         trajectory.push_back(next_pos);
-        std::cout << next_pos.getS() << ' ' << next_pos.getD() << std::endl;
+        //std::cout << next_pos.getS() << ' ' << next_pos.getD() << std::endl;
         newV = std::min(m_speed_limit/2.237, next_pos.getSpeed() + m_acceleration * m_point_interval);
         double sPos = next_pos.getS() + newV * m_point_interval;
         dist = next_pos.getS() - current_state.getS();
@@ -40,7 +40,7 @@ bool ChangeSpeedState::isStatePossible(const VehiclePosition &current_state) con
 {
 
   double new_speed = current_state.getSpeed() + m_acceleration * m_point_interval;
-  std::cout << "change speed possible" << new_speed << std::endl;
+  //std::cout << "change speed possible" << new_speed << std::endl;
   return new_speed <= m_speed_limit && new_speed >= 0 && new_speed > 0;
 }
 
