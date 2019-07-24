@@ -15,7 +15,7 @@ std::vector<VehiclePosition> ChangeSpeedState::generateTrajectory(const VehicleP
     double newV = current_state.getSpeed()/2.237 + m_acceleration * m_point_interval;
     double sPos = current_state.getS() + newV * m_point_interval;
     double dist = sPos - current_state.getS();
-    double lane_center = getLaneCenter(getCurrentLane(sPos));
+    double lane_center = getLaneCenter(getCurrentLane(current_state.getD()));
     double dPos = current_state.getD() + dist/m_trajectory_dist * (lane_center - current_state.getD());
 
     VehiclePosition next_pos(sPos, dPos, newV);

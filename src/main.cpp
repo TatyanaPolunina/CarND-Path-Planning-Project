@@ -90,7 +90,16 @@ int main() {
           //   of the road.
           auto sensor_fusion = j[1]["sensor_fusion"];
 
-          VehiclePosition current_position(car_s, car_d, car_speed);
+          double prev_size = previous_path_x.size();
+          if (prev_size >= 2)
+          {
+            double ref_x = previous_path_x[prev_size-1];
+            double ref_x_prev = previous_path_x[prev_size-2];
+            double ref_y = previous_path_y[prev_size-1];
+			double ref_y_prev = previous_path_y[prev_size-2];
+            car_speed = (sqrt((ref_x-ref_x_prev)*(ref_x-ref_x_prev)+(ref_y-ref_y_prev)*(ref_y-ref_y_prev))/.02);
+          }
+          VehiclePosition current_position(end_path_s, end_path_s, car_speed);
           current_position.setYaw(car_yaw);
 
           std::vector<VehiclePosition> other_vehicles;
@@ -110,6 +119,12 @@ int main() {
           vector<double> next_x_vals;
           vector<double> next_y_vals;
 
+          for(int i = 0; i < previous_path_x.size(); i++)
+          {
+             next_x_vals.push_back(previous_path_x[i]);
+             next_y_vals.push_back(previous_path_y[i]);
+          }
+          
           for (const auto& vehiclePosition:trajectory)
           {
              auto xy = getXY(vehiclePosition.getS(), vehiclePosition.getD(), map_waypoints_s, map_waypoints_x, map_waypoints_y);
