@@ -91,18 +91,20 @@ int main() {
           auto sensor_fusion = j[1]["sensor_fusion"];
 
           double prev_size = previous_path_x.size();
+          double ref_yaw = deg2rad(car_yaw);
           if (prev_size >= 2)
           {
             double ref_x = previous_path_x[prev_size-1];
             double ref_x_prev = previous_path_x[prev_size-2];
             double ref_y = previous_path_y[prev_size-1];
             double ref_y_prev = previous_path_y[prev_size-2];
-            car_speed = (sqrt((ref_x-ref_x_prev)*(ref_x-ref_x_prev)+(ref_y-ref_y_prev)*(ref_y-ref_y_prev))/.02);
-            auto sd = getFrenet(ref_x, ref_y, car_yaw, map_waypoints_x, map_waypoints_y);
-            end_path_s = sd[0];
-            end_path_d = sd[1];
+            ref_yaw = atan2(ref_y-ref_y_prev,ref_x-ref_x_prev);
+            car_speed = sqrt((ref_x-ref_x_prev)*(ref_x-ref_x_prev)+(ref_y-ref_y_prev)*(ref_y-ref_y_prev))/.02;
+            //auto sd = getFrenet(ref_x, ref_y, car_yaw, map_waypoints_x, map_waypoints_y);
+           // end_path_s = sd[0];
+           // end_path_d = sd[1];
            // std::cout << "s " << sd[0] << "d " << sd[1] << std::endl;
-           // std::cout << "last " << end_path_s << " " << end_path_d << std::endl;
+           // std::cout            << "last " << end_path_s << " " << end_path_d << std       
           } 
           else
           {
@@ -110,8 +112,12 @@ int main() {
              end_path_d = car_d;
           }
           
-          std::cout << "speed " << car_speed * 2.237 << std::endl;
-  
+        //  std::cout << "speed " << car_speed * 2.237 << std::endl;
+          if (car_speed >= 50)
+          {
+            std::cout << "incorrect car speed" << std::endl;
+          }
+          
           VehiclePosition current_position(end_path_s, end_path_d, car_speed);
           std::cout << "end  " << end_path_s << ' ' << end_path_d << std::endl;
           current_position.setYaw(car_yaw);
@@ -129,7 +135,7 @@ int main() {
           vector<double> next_x_vals;
           vector<double> next_y_vals;
 
-          std::cout << "prev size " <<previous_path_x.size() <<std::endl;
+          //std::cout << "prev size " <<previous_path_x.size() <<std::endl;
           for(int i = 0; i < previous_path_x.size(); i++)
           {
              next_x_vals.push_back(previous_path_x[i]);
@@ -143,13 +149,13 @@ int main() {
 
             for (const auto& vehiclePosition:trajectory)
             {
-               if (next_x_vals.size() == 50)
-                 break;
                auto xy = getXY(vehiclePosition.getS(), vehiclePosition.getD(), map_waypoints_s, map_waypoints_x, map_waypoints_y);
+               //double x_point = (xy[0] *cos(ref_yaw)-xy[1]*sin(ref_yaw));
+			  //double y_point = (xy[0] *sin(ref_yaw)+xy[1]*cos(ref_yaw));
                next_x_vals.push_back(xy[0]);
                next_y_vals.push_back(xy[1]);
             }
-            std::cout << "next size " <<next_x_vals.size() <<std::endl;
+           // std::cout << "next size " <<next_x_vals.size() <<std::endl;
           }
           json msgJson;
 

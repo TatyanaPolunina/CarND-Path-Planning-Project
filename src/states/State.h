@@ -16,7 +16,7 @@ public:
 protected:
     int getCurrentLane(double d) const;
     double getLaneCenter(int lane_num) const;
-    double m_trajectory_dist = 2;
+    double m_trajectory_dist = 3;
     double m_point_interval = 0.02;
     double m_lane_width;
 };
