@@ -52,10 +52,10 @@ int main() {
     map_waypoints_dy.push_back(d_y);
   }
 
-  h.onMessage([&map_waypoints_x,&map_waypoints_y,&map_waypoints_s,
-               &map_waypoints_dx,&map_waypoints_dy, &generator]
-              (uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
-               uWS::OpCode opCode) {
+  h.onMessage([&map_waypoints_x, &map_waypoints_y, &map_waypoints_s,
+               &map_waypoints_dx, &map_waypoints_dy,
+               &generator](uWS::WebSocket<uWS::SERVER> ws, char *data,
+                           size_t length, uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
     // The 4 signifies a websocket message
     // The 2 signifies a websocket event
@@ -65,12 +65,12 @@ int main() {
 
       if (s != "") {
         auto j = json::parse(s);
-        
+
         string event = j[0].get<string>();
-        
+
         if (event == "telemetry") {
           // j[1] is the data JSON object
-          
+
           // Main car's localization Data
           double car_x = j[1]["x"];
           double car_y = j[1]["y"];
@@ -82,96 +82,101 @@ int main() {
           // Previous path data given to the Planner
           auto previous_path_x = j[1]["previous_path_x"];
           auto previous_path_y = j[1]["previous_path_y"];
-          // Previous path's end s and d values 
+          // Previous path's end s and d values
           double end_path_s = j[1]["end_path_s"];
           double end_path_d = j[1]["end_path_d"];
 
-          // Sensor Fusion Data, a list of all other cars on the same side 
+          // Sensor Fusion Data, a list of all other cars on the same side
           //   of the road.
           auto sensor_fusion = j[1]["sensor_fusion"];
 
           double prev_size = previous_path_x.size();
+          double ref_x = car_x;
+          double ref_y = car_y;
           double ref_yaw = deg2rad(car_yaw);
-          if (prev_size >= 2)
-          {
-            double ref_x = previous_path_x[prev_size-1];
-            double ref_x_prev = previous_path_x[prev_size-2];
-            double ref_y = previous_path_y[prev_size-1];
-            double ref_y_prev = previous_path_y[prev_size-2];
-            ref_yaw = atan2(ref_y-ref_y_prev,ref_x-ref_x_prev);
-            car_speed = sqrt((ref_x-ref_x_prev)*(ref_x-ref_x_prev)+(ref_y-ref_y_prev)*(ref_y-ref_y_prev))/.02;
-            //auto sd = getFrenet(ref_x, ref_y, car_yaw, map_waypoints_x, map_waypoints_y);
-           // end_path_s = sd[0];
-           // end_path_d = sd[1];
-           // std::cout << "s " << sd[0] << "d " << sd[1] << std::endl;
-           // std::cout            << "last " << end_path_s << " " << end_path_d << std       
-          } 
-          else
-          {
-             end_path_s = car_s;
-             end_path_d = car_d;
+          if (prev_size >= 2) {
+            double ref_x = previous_path_x[prev_size - 1];
+            double ref_x_prev = previous_path_x[prev_size - 2];
+            double ref_y = previous_path_y[prev_size - 1];
+            double ref_y_prev = previous_path_y[prev_size - 2];
+            ref_yaw = atan2(ref_y - ref_y_prev, ref_x - ref_x_prev);
+            car_speed = sqrt((ref_x - ref_x_prev) * (ref_x - ref_x_prev) +
+                             (ref_y - ref_y_prev) * (ref_y - ref_y_prev)) /
+                        .02;
+            // auto sd = getFrenet(ref_x, ref_y, car_yaw, map_waypoints_x,
+            // map_waypoints_y);
+            // end_path_s = sd[0];
+            // end_path_d = sd[1];
+            // std::cout << "s " << sd[0] << "d " << sd[1] << std::endl;
+            // std::cout            << "last " << end_path_s << " " <<
+            // end_path_d << std
+          } else {
+            end_path_s = car_s;
+            end_path_d = car_d;
           }
-          
-        //  std::cout << "speed " << car_speed * 2.237 << std::endl;
-          if (car_speed >= 50)
-          {
+
+          //  std::cout << "speed " << car_speed * 2.237 << std::endl;
+          if (car_speed >= 50) {
             std::cout << "incorrect car speed" << std::endl;
           }
-          
+
           VehiclePosition current_position(end_path_s, end_path_d, car_speed);
           std::cout << "end  " << end_path_s << ' ' << end_path_d << std::endl;
           current_position.setYaw(car_yaw);
 
           std::vector<VehiclePosition> other_vehicles;
 
-          for (const auto& sensor:sensor_fusion)
-          {
-              double vx = sensor[3];
-              double vy = sensor[4];
-              double check_speed = sqrt(vx*vx+vy*vy);
-              other_vehicles.emplace_back(sensor[5], sensor[6], check_speed);
+          for (const auto &sensor : sensor_fusion) {
+            double vx = sensor[3];
+            double vy = sensor[4];
+            double check_speed = sqrt(vx * vx + vy * vy);
+            other_vehicles.emplace_back(sensor[5], sensor[6], check_speed);
           }
 
           vector<double> next_x_vals;
           vector<double> next_y_vals;
 
-          //std::cout << "prev size " <<previous_path_x.size() <<std::endl;
-          for(int i = 0; i < previous_path_x.size(); i++)
-          {
-             next_x_vals.push_back(previous_path_x[i]);
-             next_y_vals.push_back(previous_path_y[i]);
+          // std::cout << "prev size " <<previous_path_x.size() <<std::endl;
+          for (int i = 0; i < previous_path_x.size(); i++) {
+            next_x_vals.push_back(previous_path_x[i]);
+            next_y_vals.push_back(previous_path_y[i]);
           }
-          
-          if (next_x_vals.size() < 50) 
-          {
-            std::cout << "current position " << current_position.getS() << std::endl;
-            const auto trajectory = generator.generate_trajectory({current_position}, other_vehicles );
 
-            for (const auto& vehiclePosition:trajectory)
-            {
-               auto xy = getXY(vehiclePosition.getS(), vehiclePosition.getD(), map_waypoints_s, map_waypoints_x, map_waypoints_y);
-               //double x_point = (xy[0] *cos(ref_yaw)-xy[1]*sin(ref_yaw));
-			  //double y_point = (xy[0] *sin(ref_yaw)+xy[1]*cos(ref_yaw));
-               next_x_vals.push_back(xy[0]);
-               next_y_vals.push_back(xy[1]);
+          if (next_x_vals.size() < 50) {
+            std::cout << "current position " << current_position.getS()
+                      << std::endl;
+            const auto trajectory = generator.generate_trajectory(
+                {current_position}, other_vehicles);
+
+            for (const auto &vehiclePosition : trajectory) {
+
+              auto xy =
+                  getXY(vehiclePosition.getS(), vehiclePosition.getD(),
+                        map_waypoints_s, map_waypoints_x, map_waypoints_y);
+              double shift_x = xy[0] - ref_x;
+              double shift_y = xy[1] - ref_y;
+              double x_point = ref_x + (shift_x *cos(-ref_yaw)-shift_y*sin(-ref_yaw));
+              double y_point = ref_y + (shift_x *sin(-ref_yaw)+shift_y*cos(-ref_yaw));
+              next_x_vals.push_back(x_point);
+              next_y_vals.push_back(y_point);
             }
-           // std::cout << "next size " <<next_x_vals.size() <<std::endl;
+            // std::cout << "next size " <<next_x_vals.size() <<std::endl;
           }
           json msgJson;
 
           msgJson["next_x"] = next_x_vals;
           msgJson["next_y"] = next_y_vals;
 
-          auto msg = "42[\"control\","+ msgJson.dump()+"]";
+          auto msg = "42[\"control\"," + msgJson.dump() + "]";
 
           ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
-        }  // end "telemetry" if
+        } // end "telemetry" if
       } else {
         // Manual driving
         std::string msg = "42[\"manual\",{}]";
         ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
       }
-    }  // end websocket if
+    } // end websocket if
   }); // end h.onMessage
 
   h.onConnection([&h](uWS::WebSocket<uWS::SERVER> ws, uWS::HttpRequest req) {
@@ -191,6 +196,6 @@ int main() {
     std::cerr << "Failed to listen to port" << std::endl;
     return -1;
   }
-  
+
   h.run();
 }
