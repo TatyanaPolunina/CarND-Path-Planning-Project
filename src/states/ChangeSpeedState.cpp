@@ -1,5 +1,6 @@
 #include "ChangeSpeedState.h"
 #include <iostream>
+#include <sstream>
 
 ChangeSpeedState::ChangeSpeedState(const RoadOptions& options, double acceleration)
     : State (options)
@@ -10,7 +11,8 @@ ChangeSpeedState::ChangeSpeedState(const RoadOptions& options, double accelerati
 
 std::vector<VehiclePosition> ChangeSpeedState::generateTrajectory(const VehiclePosition &current_state) const
 {
-    double newV = std::min(m_speed_limit, current_state.getSpeed() + m_acceleration * m_point_interval);
+    double newV = std::min(m_options.speed_limit, current_state.getSpeed() + m_acceleration * m_point_interval);
+    std::cout << newV  << std::endl;
     double sPos = current_state.getS() + newV * m_point_interval;
     double dist = sPos - current_state.getS();
     double lane_center = m_options.getLaneCenter(m_options.getLaneNumber(current_state.getD()));
@@ -19,10 +21,11 @@ std::vector<VehiclePosition> ChangeSpeedState::generateTrajectory(const VehicleP
     VehiclePosition next_pos(sPos, dPos, newV);
 
     std::vector<VehiclePosition> trajectory;
-    while (dist < m_trajectory_dist)
+    double num_points = 0;
+    while (dist < m_trajectory_dist && num_points < 50)
     {
         trajectory.push_back(next_pos);
-        newV = std::min(m_speed_limit, next_pos.getSpeed() + m_acceleration * m_point_interval);
+        newV = std::min(m_options.speed_limit, next_pos.getSpeed() + m_acceleration * m_point_interval);
         double sPos = next_pos.getS() + newV * m_point_interval;
         dPos = lane_center;
         next_pos = VehiclePosition(sPos, dPos, newV);
@@ -35,11 +38,13 @@ std::vector<VehiclePosition> ChangeSpeedState::generateTrajectory(const VehicleP
 bool ChangeSpeedState::isStatePossible(const VehiclePosition &current_state) const
 {
   double new_speed = current_state.getSpeed() + m_acceleration * m_point_interval;
-  return new_speed <= m_options.speed_limit && new_speed >= 0;
+  return new_speed <= m_options.speed_limit && new_speed > 0;
 }
 
 
 std::string ChangeSpeedState::getName() const
 {
-    return "Change speed state";
+    std::stringstream str;
+    str << "Change speed state " << m_acceleration;
+    return str.str();
 }

@@ -12,7 +12,6 @@ public:
     std::string getName() const override;
 private:
     double m_acceleration;
-    double m_speed_limit;
 };
 
 #endif // CHANGESPEEDSTATE_H

@@ -43,7 +43,5 @@ double CarCollisionCost::calculateCost(
             }
         }
 
-
-
     }
 }
