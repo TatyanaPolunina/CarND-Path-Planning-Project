@@ -8,6 +8,7 @@
 #include "helpers.h"
 #include "json.hpp"
 #include "TrajectoryGenerator.h"
+#include "spline.h"
 
 // for convenience
 using nlohmann::json;
@@ -148,15 +149,54 @@ int main() {
             const auto trajectory = generator.generate_trajectory(
                 {current_position}, other_vehicles);
 
+
+            tk::spline spline;
+            std::vector<double> px {previous_path_x.back()};
+            std::vector<double> py{previous_path_y.back()};
+
+            auto xy =
+                getXY(trajectory.back().getS(), trajectory.back().getD(),
+                      map_waypoints_s, map_waypoints_x, map_waypoints_y);
+            px.push_back(xy[0]);
+            py.push_back(xy[1]);
+
+            xy =  getXY(end_path_s + 30, trajectory.back().getD(),
+                                  map_waypoints_s, map_waypoints_x, map_waypoints_y);
+            px.push_back(xy[0]);
+            py.push_back(xy[1]);
+
+            xy =  getXY(end_path_s + 60, trajectory.back().getD(),
+                                  map_waypoints_s, map_waypoints_x, map_waypoints_y);
+            px.push_back(xy[0]);
+            py.push_back(xy[1]);
+
+            for (int i = 0; i < px.size(); i++ )
+            {
+
+                //shift car reference angle to 0 degrees
+                double shift_x = px[i]-ref_x;
+                double shift_y = px[i]-ref_y;
+
+                px[i] = (shift_x *cos(0-ref_yaw)-shift_y*sin(0-ref_yaw));
+                py[i] = (shift_x *sin(0-ref_yaw)+shift_y*cos(0-ref_yaw));
+            }
+
+            spline.set_points(px,py);
+
             for (const auto &vehiclePosition : trajectory) {
 
-              auto xy =
-                  getXY(vehiclePosition.getS(), vehiclePosition.getD(),
-                        map_waypoints_s, map_waypoints_x, map_waypoints_y);
-              double shift_x = xy[0] - ref_x;
-              double shift_y = xy[1] - ref_y;
-              double x_point = ref_x + (shift_x *cos(-ref_yaw)-shift_y*sin(-ref_yaw));
-              double y_point = ref_y + (shift_x *sin(-ref_yaw)+shift_y*cos(-ref_yaw));
+               double x_point = vehiclePosition.getS()-end_path_s;
+               double y_point = spline(x_point);
+
+               double x_ref = x_point;
+               double y_ref = y_point;
+
+               x_point = (x_ref *cos(ref_yaw)-y_ref*sin(ref_yaw));
+               y_point = (x_ref *sin(ref_yaw)+y_ref*cos(ref_yaw));
+
+               x_point += ref_x;
+               y_point += ref_y;
+
               next_x_vals.push_back(x_point);
               next_y_vals.push_back(y_point);
             }
