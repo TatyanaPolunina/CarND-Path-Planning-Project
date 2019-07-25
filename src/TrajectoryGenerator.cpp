@@ -25,8 +25,8 @@ TrajectoryGenerator::TrajectoryGenerator(const RoadOptions &roadOptions)
   //m_states.push_back(std::move(move_right_lane));
   //m_states.push_back(std::move(move_left_lane));
   m_states.push_back(std::move(increase_speed));
-  m_states.push_back(std::move(decrease_speed));
-  m_states.push_back(std::move(keep_lane));
+  //m_states.push_back(std::move(decrease_speed));
+  //m_states.push_back(std::move(keep_lane));
 
   std::unique_ptr<SpeedEfficiencyCost> speed_efficiency(
       new SpeedEfficiencyCost(m_road_options.speed_limit));

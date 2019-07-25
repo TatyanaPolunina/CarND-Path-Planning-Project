@@ -122,7 +122,9 @@ int main() {
             double vx = sensor[3];
             double vy = sensor[4];
             double check_speed = sqrt(vx * vx + vy * vy);
-            other_vehicles.emplace_back(sensor[5], sensor[6], check_speed);
+            double v_s = sensor[5];
+            v_s += 0.02*check_speed *prev_size;
+            other_vehicles.emplace_back(v_s, sensor[6], check_speed);
           }
 
           vector<double> next_x_vals;
