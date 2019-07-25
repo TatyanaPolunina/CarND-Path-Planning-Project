@@ -96,9 +96,9 @@ int main() {
           double ref_y = car_y;
           double ref_yaw = deg2rad(car_yaw);
           if (prev_size >= 2) {
-            double ref_x = previous_path_x[prev_size - 1];
+            ref_x = previous_path_x[prev_size - 1];
             double ref_x_prev = previous_path_x[prev_size - 2];
-            double ref_y = previous_path_y[prev_size - 1];
+            ref_y = previous_path_y[prev_size - 1];
             double ref_y_prev = previous_path_y[prev_size - 2];
             ref_yaw = atan2(ref_y - ref_y_prev, ref_x - ref_x_prev);
             car_speed = sqrt((ref_x - ref_x_prev) * (ref_x - ref_x_prev) +
@@ -137,7 +137,8 @@ int main() {
           vector<double> next_x_vals;
           vector<double> next_y_vals;
 
-          // std::cout << "prev size " <<previous_path_x.size() <<std::endl;
+          std::cout << "prev size " <<previous_path_x.size() <<std::endl;
+          std::cout << "prev size " <<previous_path_x.size() <<std::endl;
           for (int i = 0; i < previous_path_x.size(); i++) {
             next_x_vals.push_back(previous_path_x[i]);
             next_y_vals.push_back(previous_path_y[i]);
@@ -151,8 +152,8 @@ int main() {
 
 
             tk::spline spline;
-            std::vector<double> px {previous_path_x.back()};
-            std::vector<double> py{previous_path_y.back()};
+            std::vector<double> px {ref_x};
+            std::vector<double> py{ref_y};
 
             auto xy =
                 getXY(trajectory.back().getS(), trajectory.back().getD(),
@@ -175,18 +176,20 @@ int main() {
 
                 //shift car reference angle to 0 degrees
                 double shift_x = px[i]-ref_x;
-                double shift_y = px[i]-ref_y;
+                double shift_y = py[i]-ref_y;
 
                 px[i] = (shift_x *cos(0-ref_yaw)-shift_y*sin(0-ref_yaw));
                 py[i] = (shift_x *sin(0-ref_yaw)+shift_y*cos(0-ref_yaw));
             }
 
             spline.set_points(px,py);
-
+            
             for (const auto &vehiclePosition : trajectory) {
 
                double x_point = vehiclePosition.getS()-end_path_s;
                double y_point = spline(x_point);
+              
+               
 
                double x_ref = x_point;
                double y_ref = y_point;
@@ -194,13 +197,14 @@ int main() {
                x_point = (x_ref *cos(ref_yaw)-y_ref*sin(ref_yaw));
                y_point = (x_ref *sin(ref_yaw)+y_ref*cos(ref_yaw));
 
+              //std::cout << x_point << " " << y_point << std::endl;
                x_point += ref_x;
                y_point += ref_y;
-
+             
+              //std::cout << ref_x << " " << ref_y << std::endl;
               next_x_vals.push_back(x_point);
               next_y_vals.push_back(y_point);
             }
-            // std::cout << "next size " <<next_x_vals.size() <<std::endl;
           }
           json msgJson;
 
@@ -208,7 +212,6 @@ int main() {
           msgJson["next_y"] = next_y_vals;
 
           auto msg = "42[\"control\"," + msgJson.dump() + "]";
-
           ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
         } // end "telemetry" if
       } else {
