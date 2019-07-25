@@ -9,7 +9,7 @@ public:
     SpeedLimitCost(double maxLimit);
 
     double calculateCost(const VehiclePosition &currentState,
-                         const VehiclePosition &nextState,
+                         const Trajectory &nextState,
                          const std::vector<VehiclePosition> &otherVehicles) const override;
 private:
     double m_limit;

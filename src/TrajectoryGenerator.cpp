@@ -12,22 +12,20 @@ TrajectoryGenerator::TrajectoryGenerator(const RoadOptions &roadOptions)
     : m_road_options(roadOptions) {
   // init all the possible states
   std::unique_ptr<ChangeLaneState> move_right_lane(new ChangeLaneState(
-      ChangeLaneState::DIR_RIGHT, m_road_options.lane_number,
-      m_road_options.lane_width, m_road_options.speed_limit, 5));
+      ChangeLaneState::DIR_RIGHT, m_road_options, 4));
   std::unique_ptr<ChangeLaneState> move_left_lane(
-      new ChangeLaneState(ChangeLaneState::DIR_LEFT, m_road_options.lane_number,
-                          m_road_options.lane_width, m_road_options.speed_limit, 5));
+      new ChangeLaneState(ChangeLaneState::DIR_LEFT, m_road_options, 4));
   std::unique_ptr<ChangeSpeedState> increase_speed(
-      new ChangeSpeedState( m_road_options.lane_width, 5, m_road_options.speed_limit));
+      new ChangeSpeedState( m_road_options, 4));
   std::unique_ptr<ChangeSpeedState> decrease_speed(
-      new ChangeSpeedState( m_road_options.lane_width, -5, m_road_options.speed_limit));
+      new ChangeSpeedState( m_road_options, -4));
   std::unique_ptr<ChangeSpeedState> keep_lane(
-      new ChangeSpeedState( m_road_options.lane_width, 0, m_road_options.speed_limit));
-  //m_states.push_back(std::move(move_right_lane));
-  //m_states.push_back(std::move(move_left_lane));
+      new ChangeSpeedState( m_road_options, 0));
+  m_states.push_back(std::move(move_right_lane));
+  m_states.push_back(std::move(move_left_lane));
   m_states.push_back(std::move(increase_speed));
-  //m_states.push_back(std::move(decrease_speed));
-  //m_states.push_back(std::move(keep_lane));
+  m_states.push_back(std::move(decrease_speed));
+  m_states.push_back(std::move(keep_lane));
 
   std::unique_ptr<SpeedEfficiencyCost> speed_efficiency(
       new SpeedEfficiencyCost(m_road_options.speed_limit));
@@ -72,7 +70,7 @@ double TrajectoryGenerator::calculateCost(
   double cost = 0;
   for (const auto &weigted_func : m_functions) {
     cost += weigted_func.first *
-            weigted_func.second->calculateCost(current_state, trajectory.back(),
+            weigted_func.second->calculateCost(current_state, trajectory,
                                                other_vehicles);
   }
   return cost;

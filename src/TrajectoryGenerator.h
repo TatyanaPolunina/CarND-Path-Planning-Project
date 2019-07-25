@@ -5,12 +5,8 @@
 #include <vector>
 #include "states/State.h"
 #include "cost_functions/CostFunction.h"
+#include "roadoptions.h"
 
-struct RoadOptions {
-  double lane_width;
-  double lane_number;
-  double speed_limit;
-};
 
 using StatePtr = std::unique_ptr<State>;
 using CostFunctionPtr = std::unique_ptr<CostFunction>;

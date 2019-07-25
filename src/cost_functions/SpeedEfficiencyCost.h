@@ -8,7 +8,7 @@ public:
   SpeedEfficiencyCost(double speed_limit);
 
   double calculateCost(
-      const VehiclePosition &currentState, const VehiclePosition &nextState,
+      const VehiclePosition &currentState, const Trajectory &nextState,
       const std::vector<VehiclePosition> &otherVehicles) const override;
 
 private:

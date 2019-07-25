@@ -6,7 +6,7 @@
 class ChangeSpeedState : public State
 {
 public:
-    ChangeSpeedState(double lane_width, double acceleration, double speed_limit);
+    ChangeSpeedState(const RoadOptions& options, double acceleration);
     std::vector<VehiclePosition> generateTrajectory(const VehiclePosition &current_state) const override;
     bool isStatePossible(const VehiclePosition &current_state) const override;
     std::string getName() const override;

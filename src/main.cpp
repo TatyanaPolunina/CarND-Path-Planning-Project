@@ -104,25 +104,16 @@ int main() {
             car_speed = sqrt((ref_x - ref_x_prev) * (ref_x - ref_x_prev) +
                              (ref_y - ref_y_prev) * (ref_y - ref_y_prev)) /
                         .02;
-            // auto sd = getFrenet(ref_x, ref_y, car_yaw, map_waypoints_x,
-            // map_waypoints_y);
-            // end_path_s = sd[0];
-            // end_path_d = sd[1];
-            // std::cout << "s " << sd[0] << "d " << sd[1] << std::endl;
-            // std::cout            << "last " << end_path_s << " " <<
-            // end_path_d << std
           } else {
             end_path_s = car_s;
             end_path_d = car_d;
           }
 
-          //  std::cout << "speed " << car_speed * 2.237 << std::endl;
           if (car_speed >= 50) {
             std::cout << "incorrect car speed" << std::endl;
           }
 
           VehiclePosition current_position(end_path_s, end_path_d, car_speed);
-          std::cout << "end  " << end_path_s << ' ' << end_path_d << std::endl;
           current_position.setYaw(car_yaw);
 
           std::vector<VehiclePosition> other_vehicles;
@@ -137,71 +128,60 @@ int main() {
           vector<double> next_x_vals;
           vector<double> next_y_vals;
 
-          std::cout << "prev size " <<previous_path_x.size() <<std::endl;
-          std::cout << "prev size " <<previous_path_x.size() <<std::endl;
           for (int i = 0; i < previous_path_x.size(); i++) {
             next_x_vals.push_back(previous_path_x[i]);
             next_y_vals.push_back(previous_path_y[i]);
           }
 
           if (next_x_vals.size() < 50) {
-            std::cout << "current position " << current_position.getS()
-                      << std::endl;
             const auto trajectory = generator.generate_trajectory(
                 {current_position}, other_vehicles);
 
-
             tk::spline spline;
-            std::vector<double> px {ref_x};
+            std::vector<double> px{ref_x};
             std::vector<double> py{ref_y};
 
-            auto xy =
-                getXY(trajectory.back().getS(), trajectory.back().getD(),
-                      map_waypoints_s, map_waypoints_x, map_waypoints_y);
+            auto xy = getXY(trajectory.back().getS(), trajectory.back().getD(),
+                            map_waypoints_s, map_waypoints_x, map_waypoints_y);
             px.push_back(xy[0]);
             py.push_back(xy[1]);
 
-            xy =  getXY(end_path_s + 30, trajectory.back().getD(),
-                                  map_waypoints_s, map_waypoints_x, map_waypoints_y);
+            xy = getXY(end_path_s + 30, trajectory.back().getD(),
+                       map_waypoints_s, map_waypoints_x, map_waypoints_y);
             px.push_back(xy[0]);
             py.push_back(xy[1]);
 
-            xy =  getXY(end_path_s + 60, trajectory.back().getD(),
-                                  map_waypoints_s, map_waypoints_x, map_waypoints_y);
+            xy = getXY(end_path_s + 60, trajectory.back().getD(),
+                       map_waypoints_s, map_waypoints_x, map_waypoints_y);
             px.push_back(xy[0]);
             py.push_back(xy[1]);
 
-            for (int i = 0; i < px.size(); i++ )
-            {
+            for (int i = 0; i < px.size(); i++) {
 
-                //shift car reference angle to 0 degrees
-                double shift_x = px[i]-ref_x;
-                double shift_y = py[i]-ref_y;
+              // shift car reference angle to 0 degrees
+              double shift_x = px[i] - ref_x;
+              double shift_y = py[i] - ref_y;
 
-                px[i] = (shift_x *cos(0-ref_yaw)-shift_y*sin(0-ref_yaw));
-                py[i] = (shift_x *sin(0-ref_yaw)+shift_y*cos(0-ref_yaw));
+              px[i] = (shift_x * cos(0 - ref_yaw) - shift_y * sin(0 - ref_yaw));
+              py[i] = (shift_x * sin(0 - ref_yaw) + shift_y * cos(0 - ref_yaw));
             }
 
-            spline.set_points(px,py);
-            
+            spline.set_points(px, py);
+
             for (const auto &vehiclePosition : trajectory) {
 
-               double x_point = vehiclePosition.getS()-end_path_s;
-               double y_point = spline(x_point);
-              
-               
+              double x_point = vehiclePosition.getS() - end_path_s;
+              double y_point = spline(x_point);
 
-               double x_ref = x_point;
-               double y_ref = y_point;
+              double x_ref = x_point;
+              double y_ref = y_point;
 
-               x_point = (x_ref *cos(ref_yaw)-y_ref*sin(ref_yaw));
-               y_point = (x_ref *sin(ref_yaw)+y_ref*cos(ref_yaw));
+              x_point = (x_ref * cos(ref_yaw) - y_ref * sin(ref_yaw));
+              y_point = (x_ref * sin(ref_yaw) + y_ref * cos(ref_yaw));
 
-              //std::cout << x_point << " " << y_point << std::endl;
-               x_point += ref_x;
-               y_point += ref_y;
-             
-              //std::cout << ref_x << " " << ref_y << std::endl;
+              x_point += ref_x;
+              y_point += ref_y;
+
               next_x_vals.push_back(x_point);
               next_y_vals.push_back(y_point);
             }

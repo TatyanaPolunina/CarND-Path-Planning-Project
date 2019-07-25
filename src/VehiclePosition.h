@@ -2,8 +2,7 @@
 #define VEHICLE_H
 
 #include <utility>
-
-using Coords = std::pair<double, double>;
+#include <vector>
 
 class VehiclePosition {
 public:
@@ -22,9 +21,12 @@ public:
   void setYaw(double yaw);
 
 private:
+  using Coords = std::pair<double, double>;
   Coords m_frenet;
   double m_speed;
   double m_yaw;
 };
+
+using Trajectory = std::vector<VehiclePosition>;
 
 #endif // VEHICLE_H

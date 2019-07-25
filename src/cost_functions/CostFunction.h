@@ -7,7 +7,7 @@
 class CostFunction {
 public:
   virtual double calculateCost(const VehiclePosition &currentState,
-                               const VehiclePosition &nextState,
+                               const Trajectory& trajectory,
                                const std::vector<VehiclePosition> &otherVehicles) const = 0;
 };
 
