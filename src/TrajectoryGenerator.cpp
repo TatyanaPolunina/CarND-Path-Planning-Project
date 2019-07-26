@@ -3,6 +3,7 @@
 #include "states/ChangeSpeedState.h"
 #include "cost_functions/SpeedEfficiencyCost.h"
 #include "cost_functions/SpeedLimitCost.h"
+#include "cost_functions/CarCollisionCost.h"
 #include <iostream>
 
 static const double SAFETY_WEIGHT = 1000;
@@ -24,14 +25,17 @@ TrajectoryGenerator::TrajectoryGenerator(const RoadOptions &roadOptions)
   //m_states.push_back(std::move(move_right_lane));
   //m_states.push_back(std::move(move_left_lane));
   m_states.push_back(std::move(increase_speed));
-  //m_states.push_back(std::move(decrease_speed));
-  //m_states.push_back(std::move(keep_lane));
+  m_states.push_back(std::move(decrease_speed));
+  m_states.push_back(std::move(keep_lane));
 
   std::unique_ptr<SpeedEfficiencyCost> speed_efficiency(
       new SpeedEfficiencyCost(m_road_options.speed_limit));
   std::unique_ptr<SpeedLimitCost> speed_limit(
       new SpeedLimitCost(m_road_options.speed_limit));
+   std::unique_ptr<CarCollisionCost> collision(
+      new CarCollisionCost(m_road_options));
   m_functions.push_back(std::make_pair(SAFETY_WEIGHT, std::move(speed_limit)));
+  m_functions.push_back(std::make_pair(SAFETY_WEIGHT, std::move(collision)));
   m_functions.push_back(
       std::make_pair(EFFITIENCY_COST, std::move(speed_efficiency)));
 }

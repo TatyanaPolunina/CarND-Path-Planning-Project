@@ -113,7 +113,7 @@ int main() {
             std::cout << "incorrect car speed" << std::endl;
           }
 
-          VehiclePosition current_position(end_path_s, end_path_d, car_speed);
+          VehiclePosition current_position(end_path_s, end_path_d, car_speed);          
           current_position.setYaw(car_yaw);
 
           std::vector<VehiclePosition> other_vehicles;

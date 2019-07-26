@@ -16,7 +16,7 @@ struct RoadOptions {
 
   double getLaneCenter(int lane_num) const
   {
-      return lane_number * lane_width + lane_width / 2.0;
+      return lane_num * lane_width + lane_width / 2.0;
   }
 };
 
