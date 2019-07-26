@@ -22,11 +22,7 @@ double CarCollisionCost::calculateCost(
             //check car behind
             if (dist_to_vehicle < m_influences_distance && dist_to_vehicle >= 0)
             {
-                if (dist_to_vehicle <= m_collision_distance)
-                {
-                    return 0;
-                }
-                result_cost = std::min(result_cost, 1 - m_collision_distance / dist_to_vehicle);
+                result_cost = std::min(result_cost, dist_to_vehicle / m_influences_distance);
             }
             // if lane changed check both sides
             if (m_options.getLaneNumber(currentState.getD()) != m_options.getLaneNumber(last_pos.getD()))
@@ -34,14 +30,11 @@ double CarCollisionCost::calculateCost(
                 double abs_dist = std::abs(dist_to_vehicle);
                 if ( abs_dist < m_influences_distance)
                 {
-                    if (abs_dist <= m_collision_distance)
-                    {
-                        return 0;
-                    }
-                    result_cost = std::min(result_cost, 1 - m_collision_distance / abs_dist);
+                    result_cost = std::min(result_cost, abs_dist/m_influences_distance);
                 }
             }
         }
 
     }
+  return result_cost;
 }
