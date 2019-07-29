@@ -194,6 +194,7 @@ int main() {
           msgJson["next_y"] = next_y_vals;
 
           auto msg = "42[\"control\"," + msgJson.dump() + "]";
+          //std::cout << msg;
           ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
         } // end "telemetry" if
       } else {

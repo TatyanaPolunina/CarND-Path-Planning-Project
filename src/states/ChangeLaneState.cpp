@@ -16,14 +16,15 @@ std::vector<VehiclePosition> ChangeLaneState::generateTrajectory(
   VehiclePosition next_pos(sPos, lane_center, newV);
   double dist = next_pos.getS() - current_state.getS();
   std::vector<VehiclePosition> trajectory;
-  while (dist < m_trajectory_dist) {
+  int num_points = 0;
+  while (num_points++ < 50) {
     trajectory.push_back(next_pos);
-    if (dist < m_trajectory_dist / 2) {
+    //if (dist < m_trajectory_dist / 2) {
       newV = next_pos.getSpeed();
-    } else {
-      newV = std::min(m_options.speed_limit,
-                      next_pos.getSpeed() + m_acceleration * m_point_interval);
-    }
+   // } else {
+  //    newV = std::min(m_options.speed_limit,
+   //                   next_pos.getSpeed() + m_acceleration * m_point_interval);
+    //}
 
     double sPos = next_pos.getS() + newV * m_point_interval;
     next_pos = VehiclePosition(sPos, lane_center, newV);

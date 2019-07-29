@@ -21,7 +21,7 @@ std::vector<VehiclePosition> ChangeSpeedState::generateTrajectory(const VehicleP
 
     std::vector<VehiclePosition> trajectory;
     double num_points = 0;
-    while (dist < m_trajectory_dist && num_points < 50)
+    while (num_points < 50)
     {
         trajectory.push_back(next_pos);
         newV = std::min(m_options.speed_limit, next_pos.getSpeed() + m_acceleration * m_point_interval);
