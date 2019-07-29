@@ -146,11 +146,6 @@ int main() {
             std::vector<double> px;
             std::vector<double> py;
 
-            if (prev_size >= 2)
-            {
-              px.push_back(previous_path_x[prev_size - 2]);
-              py.push_back(previous_path_y[prev_size - 2]);
-            }
             px.push_back(ref_x);
             py.push_back(ref_y);
             auto xy = getXY(trajectory.back().getS(), trajectory.back().getD(),
@@ -162,12 +157,6 @@ int main() {
                        map_waypoints_s, map_waypoints_x, map_waypoints_y);
             px.push_back(xy[0]);
             py.push_back(xy[1]);
-
-            xy = getXY(trajectory.back().getS() + 60, trajectory.back().getD(),
-                         map_waypoints_s, map_waypoints_x, map_waypoints_y);
-            px.push_back(xy[0]);
-            py.push_back(xy[1]);
-            
 
             for (int i = 0; i < px.size(); i++) {
 

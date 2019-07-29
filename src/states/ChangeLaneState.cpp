@@ -12,13 +12,11 @@ std::vector<VehiclePosition> ChangeLaneState::generateTrajectory(
   int num_points = 50;
   int direction = (m_direction == DIR_RIGHT) ? 1 : -1;
   int new_lane = m_options.getLaneNumber(current_state.getD()) + direction;
-  double newV =
-      std::min(current_state.getSpeed() + m_acceleration * m_point_interval,
-               m_options.speed_limit);
-  double dist = newV * m_point_interval * num_points;
-  double s_common =
-      std::sqrt(dist * dist - m_options.lane_width * m_options.lane_width);
-  double diff_s = s_common / num_points;
+  double newV = std::min(current_state.getSpeed() + m_acceleration * m_point_interval, m_options.speed_limit);
+  double dist_s = newV * m_point_interval;
+  double cos_alpha = m_options.lane_width / num_points / dist_s;
+  double sin_alpha = sqrt(1 - cos_alpha * cos_alpha);
+  double diff_s = dist_s * sin_alpha;
 
   double lane_center = m_options.getLaneCenter(new_lane);
   std::vector<VehiclePosition> trajectory;

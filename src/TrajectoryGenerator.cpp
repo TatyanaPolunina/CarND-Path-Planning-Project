@@ -14,9 +14,9 @@ TrajectoryGenerator::TrajectoryGenerator(const RoadOptions &roadOptions)
     : m_road_options(roadOptions) {
   // init all the possible states
   std::unique_ptr<ChangeLaneState> move_right_lane_with_acc(
-      new ChangeLaneState(ChangeLaneState::DIR_RIGHT, m_road_options, 1));
+      new ChangeLaneState(ChangeLaneState::DIR_RIGHT, m_road_options, 4));
   std::unique_ptr<ChangeLaneState> move_left_lane_with_acc(
-      new ChangeLaneState(ChangeLaneState::DIR_LEFT, m_road_options, 1));
+      new ChangeLaneState(ChangeLaneState::DIR_LEFT, m_road_options, 4));
   std::unique_ptr<ChangeLaneState> move_right_lane_same_speed(
       new ChangeLaneState(ChangeLaneState::DIR_RIGHT, m_road_options, 0));
   std::unique_ptr<ChangeLaneState> move_left_lane_same_speed(
