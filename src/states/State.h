@@ -8,7 +8,7 @@
 
 class State {
 public:
-  State(const RoadOptions& options);
+  State(const RoadOptions &options);
   virtual std::vector<VehiclePosition>
   generateTrajectory(const VehiclePosition &current_state) const = 0;
   virtual bool isStatePossible(const VehiclePosition &current_state) const = 0;

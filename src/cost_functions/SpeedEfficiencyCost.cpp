@@ -6,5 +6,5 @@ SpeedEfficiencyCost::SpeedEfficiencyCost(double speed_limit)
 double SpeedEfficiencyCost::calculateCost(
     const VehiclePosition &currentState, const Trajectory &nextState,
     const std::vector<VehiclePosition> &otherVehicles) const {
-  return 1 - (m_speed_limit - nextState.back().getSpeed()) / m_speed_limit;
+  return (m_speed_limit - nextState.back().getSpeed()) / m_speed_limit;
 }

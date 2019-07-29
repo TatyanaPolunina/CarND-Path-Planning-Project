@@ -7,9 +7,10 @@ struct RoadOptions {
   double lane_width;
   double lane_number;
   double speed_limit;
+  double max_s;
 
 
-  double getLaneNumber(double d) const
+  int getLaneNumber(double d) const
   {
      return static_cast<int>(d / lane_width);
   }

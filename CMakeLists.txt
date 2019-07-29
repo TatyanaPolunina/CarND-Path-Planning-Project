@@ -14,6 +14,7 @@ set(sources
     src/cost_functions/SpeedLimitCost.cpp
     src/cost_functions/SpeedEfficiencyCost.cpp
     src/cost_functions/CarCollisionCost.cpp
+    src/cost_functions/PositionEfficiencyCost.cpp
     src/states/State.cpp
     src/states/ChangeSpeedState.cpp
     src/states/ChangeLaneState.cpp

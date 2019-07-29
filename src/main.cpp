@@ -24,12 +24,12 @@ int main() {
   vector<double> map_waypoints_s;
   vector<double> map_waypoints_dx;
   vector<double> map_waypoints_dy;
-  TrajectoryGenerator generator({4, 3.0, 49 / 2.237});
 
   // Waypoint map to read from
   string map_file_ = "../data/highway_map.csv";
   // The max s value before wrapping around the track back to 0
   double max_s = 6945.554;
+  TrajectoryGenerator generator({4, 2.0, 48 / 2.237, max_s});
 
   std::ifstream in_map_(map_file_.c_str(), std::ifstream::in);
 
@@ -113,8 +113,7 @@ int main() {
             std::cout << "incorrect car speed" << std::endl;
           }
 
-          VehiclePosition current_position(end_path_s, end_path_d, car_speed);          
-          current_position.setYaw(car_yaw);
+          VehiclePosition current_position(end_path_s, end_path_d, car_speed);
 
           std::vector<VehiclePosition> other_vehicles;
 
@@ -123,7 +122,7 @@ int main() {
             double vy = sensor[4];
             double check_speed = sqrt(vx * vx + vy * vy);
             double v_s = sensor[5];
-            v_s += 0.02*check_speed *prev_size;
+            v_s += 0.02 * check_speed * prev_size;
             other_vehicles.emplace_back(v_s, sensor[6], check_speed);
           }
 
@@ -153,23 +152,27 @@ int main() {
             px.push_back(xy[0]);
             py.push_back(xy[1]);
 
-            xy = getXY(trajectory.back().getS() + 60, trajectory.back().getD(),
+            /*xy = getXY(trajectory.back().getS() + 60, trajectory.back().getD(),
                        map_waypoints_s, map_waypoints_x, map_waypoints_y);
             px.push_back(xy[0]);
             py.push_back(xy[1]);
 
+            xy = getXY(trajectory.back().getS() + 90, trajectory.back().getD(),
+                       map_waypoints_s, map_waypoints_x, map_waypoints_y);
+            px.push_back(xy[0]);
+            py.push_back(xy[1]);
+*/
             for (int i = 0; i < px.size(); i++) {
 
               // shift car reference angle to 0 degrees
               double shift_x = px[i] - ref_x;
               double shift_y = py[i] - ref_y;
 
-              px[i] = (shift_x * cos(0 - ref_yaw) - shift_y * sin(0 - ref_yaw));
-              py[i] = (shift_x * sin(0 - ref_yaw) + shift_y * cos(0 - ref_yaw));
+              px[i] = (shift_x * cos(-ref_yaw) - shift_y * sin(-ref_yaw));
+              py[i] = (shift_x * sin(-ref_yaw) + shift_y * cos(-ref_yaw));
             }
 
             spline.set_points(px, py);
-
             for (const auto &vehiclePosition : trajectory) {
 
               double x_point = vehiclePosition.getS() - end_path_s;
@@ -194,7 +197,7 @@ int main() {
           msgJson["next_y"] = next_y_vals;
 
           auto msg = "42[\"control\"," + msgJson.dump() + "]";
-          //std::cout << msg;
+          // std::cout << msg;
           ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
         } // end "telemetry" if
       } else {

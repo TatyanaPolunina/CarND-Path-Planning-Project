@@ -13,7 +13,6 @@ public:
 
 private:
   double m_speed_limit;
-
 };
 
 #endif // SPEEDEFFICIENCYCOST_H
