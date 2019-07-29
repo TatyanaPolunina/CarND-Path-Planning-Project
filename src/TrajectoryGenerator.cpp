@@ -8,15 +8,15 @@
 #include <iostream>
 
 static const double SAFETY_WEIGHT = 1000;
-static const double EFFITIENCY_COST = 100;
+static const double EFFITIENCY_WEIGHT = 100;
 
 TrajectoryGenerator::TrajectoryGenerator(const RoadOptions &roadOptions)
     : m_road_options(roadOptions) {
   // init all the possible states
   std::unique_ptr<ChangeLaneState> move_right_lane_with_acc(
-      new ChangeLaneState(ChangeLaneState::DIR_RIGHT, m_road_options, 3));
+      new ChangeLaneState(ChangeLaneState::DIR_RIGHT, m_road_options, 1));
   std::unique_ptr<ChangeLaneState> move_left_lane_with_acc(
-      new ChangeLaneState(ChangeLaneState::DIR_LEFT, m_road_options, 3));
+      new ChangeLaneState(ChangeLaneState::DIR_LEFT, m_road_options, 1));
   std::unique_ptr<ChangeLaneState> move_right_lane_same_speed(
       new ChangeLaneState(ChangeLaneState::DIR_RIGHT, m_road_options, 0));
   std::unique_ptr<ChangeLaneState> move_left_lane_same_speed(
@@ -47,9 +47,9 @@ TrajectoryGenerator::TrajectoryGenerator(const RoadOptions &roadOptions)
   m_functions.push_back(std::make_pair(SAFETY_WEIGHT, std::move(collision)));
   m_functions.push_back(std::make_pair(SAFETY_WEIGHT, std::move(speed_limit)));
   m_functions.push_back(
-      std::make_pair(EFFITIENCY_COST, std::move(speed_efficiency)));
+      std::make_pair(EFFITIENCY_WEIGHT, std::move(speed_efficiency)));
   m_functions.push_back(
-      std::make_pair(EFFITIENCY_COST, std::move(pos_efficiency)));
+      std::make_pair(EFFITIENCY_WEIGHT, std::move(pos_efficiency)));
 }
 
 std::vector<VehiclePosition> TrajectoryGenerator::generate_trajectory(
