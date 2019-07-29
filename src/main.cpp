@@ -31,7 +31,8 @@ int main() {
   double max_s = 6945.554;
 
   // generator which provide the best trajectory based on cost function
-  TrajectoryGenerator generator({4, 2.0, 48 / 2.237, max_s});
+  RoadOptions road_options = {4, 2.0, 48 / 2.237, max_s};
+  TrajectoryGenerator generator(road_options);
 
   std::ifstream in_map_(map_file_.c_str(), std::ifstream::in);
 
@@ -57,7 +58,7 @@ int main() {
 
   h.onMessage([&map_waypoints_x, &map_waypoints_y, &map_waypoints_s,
                &map_waypoints_dx, &map_waypoints_dy,
-               &generator](uWS::WebSocket<uWS::SERVER> ws, char *data,
+               &generator, &road_options](uWS::WebSocket<uWS::SERVER> ws, char *data,
                            size_t length, uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
     // The 4 signifies a websocket message
@@ -142,9 +143,16 @@ int main() {
 
             //provide spline for correct mapping to x,y coordinates
             tk::spline spline;
-            std::vector<double> px{ref_x};
-            std::vector<double> py{ref_y};
+            std::vector<double> px;
+            std::vector<double> py;
 
+            if (prev_size >= 2)
+            {
+              px.push_back(previous_path_x[prev_size - 2]);
+              py.push_back(previous_path_y[prev_size - 2]);
+            }
+            px.push_back(ref_x);
+            py.push_back(ref_y);
             auto xy = getXY(trajectory.back().getS(), trajectory.back().getD(),
                             map_waypoints_s, map_waypoints_x, map_waypoints_y);
             px.push_back(xy[0]);
@@ -156,9 +164,10 @@ int main() {
             py.push_back(xy[1]);
 
             xy = getXY(trajectory.back().getS() + 60, trajectory.back().getD(),
-                       map_waypoints_s, map_waypoints_x, map_waypoints_y);
+                         map_waypoints_s, map_waypoints_x, map_waypoints_y);
             px.push_back(xy[0]);
             py.push_back(xy[1]);
+            
 
             for (int i = 0; i < px.size(); i++) {
 

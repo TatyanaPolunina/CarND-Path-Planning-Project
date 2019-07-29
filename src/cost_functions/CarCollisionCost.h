@@ -20,6 +20,7 @@ public:
 private:
   RoadOptions m_options;
   double m_influences_distance = 30; // meters
+  double m_collisions_distance = 30; // meters
 };
 
 #endif // CARCOLLISIONCOST_H
