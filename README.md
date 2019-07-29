@@ -69,21 +69,19 @@ the path has processed since last time.
 
 1. The best path is generated inside *TrajectoryGenerator* class based on defined cost function.
 2. *TrajectoryGenerator* initializes all the possible trajectories which may be generated and cost functions to define the best trajectory
-3. All the possible trajectories (states) are generated in classes inherited from the abstract *State* class. Such a stated are defined:
-  * *ChangeSpeedState* - the car stays in the same lane. Depending on acceleration parameter in constructor three different stated are initialized by current class: increase speed state, decrease speed state, leave the same speed
-  * *ChangeLaneSpeed* - the car move to another lane. Depending on initialization parameters for states are initialized: move to left lane with the same speed, move to left lane with increased speed, and the both for right lane
-
-4. All the possible cost functions are derived from *CostFunction* abstract class. The cost functions should return the values between 0 and 1. 
-5. Each initialized cost function has own weight to produse weighted costfunctions. Now two weights are defined:  SAFETY_WEIGHT = 1000 and EFFITIENCY_COST = 100. 
-6. It's absolutely possible to define separate weights for separate cost functions. 
+3. All the possible trajectories (states) are generated in classes inherited from the abstract *State* class. Such states are defined:
+   * *ChangeSpeedState* - the car stays in the same lane. Depending on acceleration parameter in constructor three different states are initialized by current class: spead increasing, speed decreasing, leave the same speed
+   * *ChangeLaneSpeed* - the car move to another lane. Depending on initialization parameters four states are initialized: move to left lane with the same speed, move to left lane with increased speed, and the both for right lane
+4. All the possible cost functions are derived from *CostFunction* abstract class. The cost functions should return the values between 0 and 1. The better state should have the lower cost.
+5. Each cost function has own weight to produce weighted cost functions result inside TrajectoryGenerator. Now two weights are defined:  SAFETY_WEIGHT = 1000 and EFFITIENCY_COST = 100. But it's absolutely possible to define separate weights for separate cost functions. 
 7. Such cost functions are defined now:
-  * CarCollisionCost (safety) - check the cars distance in current and destination lane
-  * SpeedLimitCost (safety) - binary function to check if the speed less than speed limit
-  * SpeedEfficiencyCost (effitiency) - the better trajectory need to have more final speed we have
-  * PositionEfficiencyCost (effitienct) - ther better trajectory should have bigger S coordinate to reach the goal more quickly
-8. All the possible cost functions with corresponded weights are defined inside  *TrajectoryGenerator* constructor together with possible states
-9. Trajectories are generated in frenet coordinates. The transformations to cartesian coordinates are provided in main.cpp
-10. Car angle is taken into account. Smoothing is done using spline componens
+   * CarCollisionCost (safety) - check the distance between our car and other cars on the road in current and destination lane
+   * SpeedLimitCost (safety) - binary function to check if the speed less than speed limit   
+   * SpeedEfficiencyCost (effitiency) - the better trajectory needs to have bigger final speed
+   * PositionEfficiencyCost (effitienct) - ther better trajectory should have bigger S coordinate to reach the goal more quickly
+8. All the possible cost functions with corresponded weights are defined inside  *TrajectoryGenerator* constructor together with all the defined states
+9. Trajectories are generated in frenet coordinates. The transformations to cartesian coordinates are provided inside main.cpp
+10. Car angle is taken into account though transformations. Smoothing is done using spline component
 
 
 ## Dependencies
@@ -115,46 +113,3 @@ using the following settings:
 
 * indent using spaces
 * set tab width to 2 spaces (keeps the matrices in source code aligned)
-
-## Code Style
-
-Please (do your best to) stick to [Google's C++ style guide](https://google.github.io/styleguide/cppguide.html).
-
-## Project Instructions and Rubric
-
-Note: regardless of the changes you make, your project must be buildable using
-cmake and make!
-
-
-## Call for IDE Profiles Pull Requests
-
-Help your fellow students!
-
-We decided to create Makefiles with cmake to keep this project as platform
-agnostic as possible. Similarly, we omitted IDE profiles in order to ensure
-that students don't feel pressured to use one IDE or another.
-
-However! I'd love to help people get up and running with their IDEs of choice.
-If you've created a profile for an IDE that you think other students would
-appreciate, we'd love to have you add the requisite profile files and
-instructions to ide_profiles/. For example if you wanted to add a VS Code
-profile, you'd add:
-
-* /ide_profiles/vscode/.vscode
-* /ide_profiles/vscode/README.md
-
-The README should explain what the profile does, how to take advantage of it,
-and how to install it.
-
-Frankly, I've never been involved in a project with multiple IDE profiles
-before. I believe the best way to handle this would be to keep them out of the
-repo root to avoid clutter. My expectation is that most profiles will include
-instructions to copy files to a new location to get picked up by the IDE, but
-that's just a guess.
-
-One last note here: regardless of the IDE used, every submitted project must
-still be compilable with cmake and make./
-
-## How to write a README
-A well written README file can enhance your project and portfolio.  Develop your abilities to create professional README files by completing [this free course](https://www.udacity.com/course/writing-readmes--ud777).
-
