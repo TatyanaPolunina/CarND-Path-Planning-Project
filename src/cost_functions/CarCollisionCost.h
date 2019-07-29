@@ -4,6 +4,11 @@
 #include "CostFunction.h"
 #include "../roadoptions.h"
 
+
+/*
+ * Cost function which check the collisions in current and destination lane
+ *
+*/
 class CarCollisionCost : public CostFunction {
 public:
   CarCollisionCost(const RoadOptions &m_options);
@@ -14,7 +19,6 @@ public:
 
 private:
   RoadOptions m_options;
-  double m_collision_distance = 30;  // meters
   double m_influences_distance = 30; // meters
 };
 

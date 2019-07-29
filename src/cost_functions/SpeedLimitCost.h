@@ -3,6 +3,9 @@
 
 #include "CostFunction.h"
 
+/*
+ * binary cost to check speed limit
+ */
 class SpeedLimitCost : public CostFunction
 {
 public:

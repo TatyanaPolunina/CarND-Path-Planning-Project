@@ -35,6 +35,7 @@ TrajectoryGenerator::TrajectoryGenerator(const RoadOptions &roadOptions)
   m_states.push_back(std::move(decrease_speed));
   m_states.push_back(std::move(keep_lane));
 
+  // define all the presented cost function with corresponded weights
   std::unique_ptr<SpeedEfficiencyCost> speed_efficiency(
       new SpeedEfficiencyCost(m_road_options.speed_limit));
   std::unique_ptr<SpeedLimitCost> speed_limit(
@@ -57,24 +58,23 @@ std::vector<VehiclePosition> TrajectoryGenerator::generate_trajectory(
   using Trajectory = std::vector<VehiclePosition>;
   std::vector<Trajectory> possible_trajectories;
   const VehiclePosition &current_state = previousTrajectory.back();
+  //generate all the possible trajectories
   for (const auto &state : m_states) {
     if (state->isStatePossible(current_state)) {
       possible_trajectories.push_back(state->generateTrajectory(current_state));
     }
   }
 
+  // find the best trajectory based on cost function costs
   auto best_trajectory = possible_trajectories.begin();
   double best_cost =
       calculateCost(current_state, *best_trajectory, other_vehicles);
-  int i = 0;
-  int best_i = 0;
   for (auto iter = possible_trajectories.begin() + 1;
-       iter != possible_trajectories.end(); ++iter, ++i) {
+       iter != possible_trajectories.end(); ++iter) {
     double cost = calculateCost(current_state, *iter, other_vehicles);
     if (cost < best_cost) {
       best_cost = cost;
       best_trajectory = iter;
-      best_i = i;
     }
   }
 

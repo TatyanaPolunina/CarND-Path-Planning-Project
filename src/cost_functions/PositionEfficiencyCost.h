@@ -4,13 +4,18 @@
 #include "CostFunction.h"
 #include "../roadoptions.h"
 
-class PositionEfficiencyCost : public CostFunction
-{
+/*
+ * the better trajectory should have the bigger S coordinate
+ */
+class PositionEfficiencyCost : public CostFunction {
 public:
-    PositionEfficiencyCost(const RoadOptions& options);
-    double calculateCost(const VehiclePosition &currentState, const Trajectory &trajectory, const std::vector<VehiclePosition> &otherVehicles) const override;
+  PositionEfficiencyCost(const RoadOptions &options);
+  double calculateCost(
+      const VehiclePosition &currentState, const Trajectory &trajectory,
+      const std::vector<VehiclePosition> &otherVehicles) const override;
+
 private:
-    RoadOptions m_road_options;
+  RoadOptions m_road_options;
 };
 
 #endif // POSITIONEFFICIENCYCOST_H

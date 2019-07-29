@@ -1,7 +1,9 @@
 #ifndef ROADOPTIONS_H
 #define ROADOPTIONS_H
 
-
+/*
+ * Static road options
+ */
 struct RoadOptions {
 
   double lane_width;

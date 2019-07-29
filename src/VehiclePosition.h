@@ -4,6 +4,10 @@
 #include <utility>
 #include <vector>
 
+/*
+ * Define vehicle state in frenet coordinates
+ *
+*/
 class VehiclePosition {
 public:
   VehiclePosition(double s, double d, double speed);
@@ -11,8 +15,6 @@ public:
   const double &getS() const;
 
   const double &getD() const;
-
-  double getYaw() const;
 
   double getSpeed() const;
 
@@ -23,6 +25,7 @@ private:
   Coords m_frenet;
   double m_speed;
 };
+
 
 using Trajectory = std::vector<VehiclePosition>;
 

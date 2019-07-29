@@ -29,6 +29,8 @@ int main() {
   string map_file_ = "../data/highway_map.csv";
   // The max s value before wrapping around the track back to 0
   double max_s = 6945.554;
+
+  // generator which provide the best trajectory based on cost function
   TrajectoryGenerator generator({4, 2.0, 48 / 2.237, max_s});
 
   std::ifstream in_map_(map_file_.c_str(), std::ifstream::in);
@@ -109,12 +111,6 @@ int main() {
             end_path_d = car_d;
           }
 
-          if (car_speed >= 50) {
-            std::cout << "incorrect car speed" << std::endl;
-          }
-
-          VehiclePosition current_position(end_path_s, end_path_d, car_speed);
-
           std::vector<VehiclePosition> other_vehicles;
 
           for (const auto &sensor : sensor_fusion) {
@@ -129,15 +125,22 @@ int main() {
           vector<double> next_x_vals;
           vector<double> next_y_vals;
 
+          // insert the points from previous trajectory
           for (int i = 0; i < previous_path_x.size(); i++) {
             next_x_vals.push_back(previous_path_x[i]);
             next_y_vals.push_back(previous_path_y[i]);
           }
 
+          // if points less than limit, generate new trajectory
           if (next_x_vals.size() < 50) {
+            // init current position in frenet coordinates
+            VehiclePosition current_position(end_path_s, end_path_d, car_speed);
+
+            // jenerate the best trajectory
             const auto trajectory = generator.generate_trajectory(
                 {current_position}, other_vehicles);
 
+            //provide spline for correct mapping to x,y coordinates
             tk::spline spline;
             std::vector<double> px{ref_x};
             std::vector<double> py{ref_y};
@@ -152,16 +155,11 @@ int main() {
             px.push_back(xy[0]);
             py.push_back(xy[1]);
 
-            /*xy = getXY(trajectory.back().getS() + 60, trajectory.back().getD(),
+            xy = getXY(trajectory.back().getS() + 60, trajectory.back().getD(),
                        map_waypoints_s, map_waypoints_x, map_waypoints_y);
             px.push_back(xy[0]);
             py.push_back(xy[1]);
 
-            xy = getXY(trajectory.back().getS() + 90, trajectory.back().getD(),
-                       map_waypoints_s, map_waypoints_x, map_waypoints_y);
-            px.push_back(xy[0]);
-            py.push_back(xy[1]);
-*/
             for (int i = 0; i < px.size(); i++) {
 
               // shift car reference angle to 0 degrees
@@ -173,6 +171,7 @@ int main() {
             }
 
             spline.set_points(px, py);
+
             for (const auto &vehiclePosition : trajectory) {
 
               double x_point = vehiclePosition.getS() - end_path_s;
@@ -191,6 +190,7 @@ int main() {
               next_y_vals.push_back(y_point);
             }
           }
+
           json msgJson;
 
           msgJson["next_x"] = next_x_vals;

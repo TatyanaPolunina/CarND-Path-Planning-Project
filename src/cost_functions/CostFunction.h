@@ -4,6 +4,12 @@
 #include "../VehiclePosition.h"
 #include <vector>
 
+
+/*
+ * Base cost function to define the best trajectory
+ * cost should be in [0,1] interval
+ * best trajectory should be chosen with minimum cost
+ */
 class CostFunction {
 public:
   virtual double

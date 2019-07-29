@@ -11,9 +11,17 @@
 using StatePtr = std::unique_ptr<State>;
 using CostFunctionPtr = std::unique_ptr<CostFunction>;
 
+/*
+ * Generate all the possible trajectories and provide the best based on function costs
+ *
+*/
 class TrajectoryGenerator {
 public:
   TrajectoryGenerator(const RoadOptions &roadOptions);
+
+  /*
+   * Return the best of possible trajectories based on functions costs
+   */
   std::vector<VehiclePosition>
   generate_trajectory(const std::vector<VehiclePosition> &previousTrajectory,
                       const std::vector<VehiclePosition> &other_vehicles);

@@ -3,6 +3,10 @@
 
 #include "State.h"
 
+/*
+ * State which keeps the lane but change the car speed based on input acceleration
+ */
+
 class ChangeSpeedState : public State {
 public:
   ChangeSpeedState(const RoadOptions &options, double acceleration);

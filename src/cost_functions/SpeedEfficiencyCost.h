@@ -3,6 +3,9 @@
 
 #include "CostFunction.h"
 
+/*
+ * check that we go with the maximum possible speed
+ */
 class SpeedEfficiencyCost : public CostFunction {
 public:
   SpeedEfficiencyCost(double speed_limit);
