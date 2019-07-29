@@ -148,12 +148,12 @@ int main() {
             px.push_back(xy[0]);
             py.push_back(xy[1]);
 
-            xy = getXY(end_path_s + 30, trajectory.back().getD(),
+            xy = getXY(trajectory.back().getS() + 30, trajectory.back().getD(),
                        map_waypoints_s, map_waypoints_x, map_waypoints_y);
             px.push_back(xy[0]);
             py.push_back(xy[1]);
 
-            xy = getXY(end_path_s + 60, trajectory.back().getD(),
+            xy = getXY(trajectory.back().getS() + 60, trajectory.back().getD(),
                        map_waypoints_s, map_waypoints_x, map_waypoints_y);
             px.push_back(xy[0]);
             py.push_back(xy[1]);

@@ -34,8 +34,8 @@ TrajectoryGenerator::TrajectoryGenerator(const RoadOptions &roadOptions)
       new SpeedLimitCost(m_road_options.speed_limit));
    std::unique_ptr<CarCollisionCost> collision(
       new CarCollisionCost(m_road_options));
-  m_functions.push_back(std::make_pair(SAFETY_WEIGHT, std::move(speed_limit)));
   m_functions.push_back(std::make_pair(SAFETY_WEIGHT, std::move(collision)));
+  m_functions.push_back(std::make_pair(EFFITIENCY_COST, std::move(speed_limit)));
   m_functions.push_back(
       std::make_pair(EFFITIENCY_COST, std::move(speed_efficiency)));
 }

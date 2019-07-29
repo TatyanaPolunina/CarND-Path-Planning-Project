@@ -1,5 +1,6 @@
 #include "ChangeLaneState.h"
 #include <iostream>
+#include <cmath>
 
 ChangeLaneState::ChangeLaneState(ChangeLaneState::LaneDirection direction,
                                  const RoadOptions& options, double acceleration)
@@ -7,28 +8,20 @@ ChangeLaneState::ChangeLaneState(ChangeLaneState::LaneDirection direction,
 
 std::vector<VehiclePosition> ChangeLaneState::generateTrajectory(
     const VehiclePosition &current_state) const {
+  int num_points = 50;
   int direction = (m_direction == DIR_RIGHT) ? 1 : -1;
   int new_lane = m_options.getLaneNumber(current_state.getD()) + direction;
+  double newV = std::min(current_state.getSpeed(), m_options.speed_limit);
+  double dist = newV * m_point_interval*num_points;  
+  double s_common = std::sqrt(dist * dist - m_options.lane_width * m_options.lane_width);
+  double diff_s = s_common / num_points;
 
-  double newV = current_state.getSpeed();
-  double sPos = current_state.getS() + newV * m_point_interval;
-  double lane_center = m_options.getLaneCenter(new_lane);
-  VehiclePosition next_pos(sPos, lane_center, newV);
-  double dist = next_pos.getS() - current_state.getS();
+  double lane_center = m_options.getLaneCenter(new_lane);  
   std::vector<VehiclePosition> trajectory;
-  int num_points = 0;
-  while (num_points++ < 50) {
-    trajectory.push_back(next_pos);
-    //if (dist < m_trajectory_dist / 2) {
-      newV = next_pos.getSpeed();
-   // } else {
-  //    newV = std::min(m_options.speed_limit,
-   //                   next_pos.getSpeed() + m_acceleration * m_point_interval);
-    //}
-
-    double sPos = next_pos.getS() + newV * m_point_interval;
-    next_pos = VehiclePosition(sPos, lane_center, newV);
-    dist = next_pos.getS() - current_state.getS();
+  double next_s = current_state.getS() + diff_s;  
+  for (int i = 0; i < num_points; ++i) {
+    trajectory.emplace_back(next_s, lane_center, newV);
+    next_s += diff_s;
   }
   return trajectory;
 }
