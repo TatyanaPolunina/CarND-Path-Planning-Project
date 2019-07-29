@@ -23,6 +23,9 @@ std::vector<VehiclePosition> ChangeLaneState::generateTrajectory(
   double next_s = current_state.getS() + diff_s;
   for (int i = 0; i < num_points; ++i) {
     trajectory.emplace_back(next_s, lane_center, newV);
+    newV = std::min(newV + m_acceleration * m_point_interval, m_options.speed_limit);
+    dist_s = newV * m_point_interval;
+    diff_s = dist_s * sin_alpha;
     next_s += diff_s;
   }
   return trajectory;

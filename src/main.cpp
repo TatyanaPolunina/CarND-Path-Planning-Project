@@ -145,6 +145,11 @@ int main() {
             tk::spline spline;
             std::vector<double> px;
             std::vector<double> py;
+            if (prev_size >= 2)
+            {
+                px.push_back(previous_path_x[prev_size - 2]);
+                py.push_back(previous_path_y[prev_size - 2]);
+            }
 
             px.push_back(ref_x);
             py.push_back(ref_y);
