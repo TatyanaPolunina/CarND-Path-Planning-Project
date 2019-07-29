@@ -65,11 +65,26 @@ the path has processed since last time.
 
 2. There will be some latency between the simulator running and the path planner returning a path, with optimized code usually its not very long maybe just 1-3 time steps. During this delay the simulator will continue using points that it was last given, because of this its a good idea to store the last points you have used so you can have a smooth transition. previous_path_x, and previous_path_y can be helpful for this transition since they show the last points given to the simulator controller with the processed points already removed. You would either return a path that extends this previous path or make sure to create a new path that has a smooth transition with this last path.
 
-## Tips
+## Model documentation
 
-A really helpful resource for doing this project and creating smooth trajectories was using http://kluge.in-chemnitz.de/opensource/spline/, the spline function is in a single hearder file is really easy to use.
+1. The best path is generated inside *TrajectoryGenerator* class based on defined cost function.
+2. *TrajectoryGenerator* initializes all the possible trajectories which may be generated and cost functions to define the best trajectory
+3. All the possible trajectories (states) are generated in classes inherited from the abstract *State* class. Such a stated are defined:
+  * *ChangeSpeedState* - the car stays in the same lane. Depending on acceleration parameter in constructor three different stated are initialized by current class: increase speed state, decrease speed state, leave the same speed
+  * *ChangeLaneSpeed* - the car move to another lane. Depending on initialization parameters for states are initialized: move to left lane with the same speed, move to left lane with increased speed, and the both for right lane
 
----
+4. All the possible cost functions are derived from *CostFunction* abstract class. The cost functions should return the values between 0 and 1. 
+5. Each initialized cost function has own weight to produse weighted costfunctions. Now two weights are defined:  SAFETY_WEIGHT = 1000 and EFFITIENCY_COST = 100. 
+6. It's absolutely possible to define separate weights for separate cost functions. 
+7. Such cost functions are defined now:
+  * CarCollisionCost (safety) - check the cars distance in current and destination lane
+  * SpeedLimitCost (safety) - binary function to check if the speed less than speed limit
+  * SpeedEfficiencyCost (effitiency) - the better trajectory need to have more final speed we have
+  * PositionEfficiencyCost (effitienct) - ther better trajectory should have bigger S coordinate to reach the goal more quickly
+8. All the possible cost functions with corresponded weights are defined inside  *TrajectoryGenerator* constructor together with possible states
+9. Trajectories are generated in frenet coordinates. The transformations to cartesian coordinates are provided in main.cpp
+10. Car angle is taken into account. Smoothing is done using spline componens
+
 
 ## Dependencies
 
