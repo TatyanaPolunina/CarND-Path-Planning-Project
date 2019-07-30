@@ -28,8 +28,8 @@ double CarCollisionCost::calculateCost(
           m_options.getLaneNumber(last_pos.getD())) {
         double abs_dist = std::abs(dist_to_vehicle);
         if (abs_dist < m_collisions_distance && abs_dist > 0) {
-          result_cost =
-              std::max(result_cost, 1 - abs_dist / m_collisions_distance);
+          	result_cost =
+             	 std::max(result_cost, 1 - abs_dist / m_collisions_distance);
         }
       }
     }

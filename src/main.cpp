@@ -31,7 +31,7 @@ int main() {
   double max_s = 6945.554;
 
   // generator which provide the best trajectory based on cost function
-  RoadOptions road_options = {4, 2.0, 48 / 2.237, max_s};
+  RoadOptions road_options = {4, 3.0, 48 / 2.237, max_s};
   TrajectoryGenerator generator(road_options);
 
   std::ifstream in_map_(map_file_.c_str(), std::ifstream::in);
@@ -145,7 +145,8 @@ int main() {
             tk::spline spline;
             std::vector<double> px;
             std::vector<double> py;
-            if (prev_size >= 2)
+            //to difficult geometry when lane changing
+            if (prev_size >= 2  && road_options.getLaneNumber( trajectory.back().getD()) == road_options.getLaneNumber(end_path_d) )
             {
                 px.push_back(previous_path_x[prev_size - 2]);
                 py.push_back(previous_path_y[prev_size - 2]);
@@ -162,7 +163,11 @@ int main() {
                        map_waypoints_s, map_waypoints_x, map_waypoints_y);
             px.push_back(xy[0]);
             py.push_back(xy[1]);
-
+            xy = getXY(trajectory.back().getS() + 60, trajectory.back().getD(),
+                       map_waypoints_s, map_waypoints_x, map_waypoints_y);
+            px.push_back(xy[0]);
+            py.push_back(xy[1]);
+            
             for (int i = 0; i < px.size(); i++) {
 
               // shift car reference angle to 0 degrees

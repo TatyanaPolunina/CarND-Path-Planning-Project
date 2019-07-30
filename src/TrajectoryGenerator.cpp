@@ -7,16 +7,12 @@
 #include "cost_functions/PositionEfficiencyCost.h"
 #include <iostream>
 
-static const double SAFETY_WEIGHT = 1000;
-static const double EFFITIENCY_WEIGHT = 100;
+static const double SAFETY_WEIGHT = 100;
+static const double EFFITIENCY_WEIGHT = 1;
 
 TrajectoryGenerator::TrajectoryGenerator(const RoadOptions &roadOptions)
     : m_road_options(roadOptions) {
-  // init all the possible states
-  std::unique_ptr<ChangeLaneState> move_right_lane_with_acc(
-      new ChangeLaneState(ChangeLaneState::DIR_RIGHT, m_road_options, 3));
-  std::unique_ptr<ChangeLaneState> move_left_lane_with_acc(
-      new ChangeLaneState(ChangeLaneState::DIR_LEFT, m_road_options, 3));
+  // init all the possible states  
   std::unique_ptr<ChangeLaneState> move_right_lane_same_speed(
       new ChangeLaneState(ChangeLaneState::DIR_RIGHT, m_road_options, 0));
   std::unique_ptr<ChangeLaneState> move_left_lane_same_speed(
@@ -26,9 +22,7 @@ TrajectoryGenerator::TrajectoryGenerator(const RoadOptions &roadOptions)
   std::unique_ptr<ChangeSpeedState> decrease_speed(
       new ChangeSpeedState(m_road_options, -4));
   std::unique_ptr<ChangeSpeedState> keep_lane(
-      new ChangeSpeedState(m_road_options, 0));
-  m_states.push_back(std::move(move_right_lane_with_acc));
-  m_states.push_back(std::move(move_left_lane_with_acc));
+      new ChangeSpeedState(m_road_options, 0));  
   m_states.push_back(std::move(move_right_lane_same_speed));
   m_states.push_back(std::move(move_left_lane_same_speed));
   m_states.push_back(std::move(increase_speed));
