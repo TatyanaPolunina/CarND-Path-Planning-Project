@@ -9,7 +9,6 @@
 
 
 using StatePtr = std::unique_ptr<State>;
-using CostFunctionPtr = std::unique_ptr<CostFunction>;
 
 /*
  * Generate all the possible trajectories and provide the best based on function costs
@@ -22,19 +21,13 @@ public:
   /*
    * Return the best of possible trajectories based on functions costs
    */
-  std::vector<VehiclePosition>
-  generate_trajectory(const std::vector<VehiclePosition> &previousTrajectory,
-                      const std::vector<VehiclePosition> &other_vehicles);
+  std::vector<Trajectory>
+  generate_trajectories(const std::vector<VehiclePosition> &previousTrajectory);
 
 private:
-  double calculateCost(const VehiclePosition &current_state,
-                       const std::vector<VehiclePosition> &trajectory,
-                       const std::vector<VehiclePosition> &other_vehicles);
 
   RoadOptions m_road_options;
   std::vector<StatePtr> m_states;
-  using WeightedCost = std::pair<double, CostFunctionPtr>;
-  std::vector<WeightedCost> m_functions;
 };
 
 #endif // TRAJECTORYGENERATOR_H

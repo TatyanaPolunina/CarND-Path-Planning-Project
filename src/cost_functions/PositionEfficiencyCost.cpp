@@ -5,6 +5,8 @@ PositionEfficiencyCost::PositionEfficiencyCost(const RoadOptions &options)
 
 double PositionEfficiencyCost::calculateCost(
     const VehiclePosition &currentState, const Trajectory &trajectory,
+    const std::vector<double> &x,
+    const std::vector<double> &y,
     const std::vector<VehiclePosition> &otherVehicles) const {
   double s = trajectory.back().getS();
   while (s > m_road_options.max_s) {

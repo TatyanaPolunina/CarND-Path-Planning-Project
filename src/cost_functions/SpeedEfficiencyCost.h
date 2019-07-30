@@ -12,6 +12,8 @@ public:
 
   double calculateCost(
       const VehiclePosition &currentState, const Trajectory &nextState,
+      const std::vector<double> &x,
+      const std::vector<double> &y,
       const std::vector<VehiclePosition> &otherVehicles) const override;
 
 private:

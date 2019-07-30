@@ -18,8 +18,7 @@ std::vector<VehiclePosition> ChangeSpeedState::generateTrajectory(
   double num_points = 0;
   while (num_points++ < 50) {
     trajectory.emplace_back(sPos, lane_center, newV);
-    newV = std::min(m_options.speed_limit,
-                    newV + m_acceleration * m_point_interval);
+    newV = std::max(newV + m_acceleration * m_point_interval, 0.0);
     sPos = sPos + newV * m_point_interval;
   }
   return trajectory;

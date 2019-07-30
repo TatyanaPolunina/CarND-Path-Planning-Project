@@ -7,6 +7,8 @@ CarCollisionCost::CarCollisionCost(const RoadOptions &options)
 
 double CarCollisionCost::calculateCost(
     const VehiclePosition &currentState, const Trajectory &nextState,
+    const std::vector<double> &x,
+    const std::vector<double> &y,
     const std::vector<VehiclePosition> &otherVehicles) const {
   double result_cost = 0;
   const auto &last_pos = nextState.back();

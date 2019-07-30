@@ -15,6 +15,8 @@ public:
   virtual double
   calculateCost(const VehiclePosition &currentState,
                 const Trajectory &trajectory,
+                const std::vector<double> &x,
+                const std::vector<double> &y,
                 const std::vector<VehiclePosition> &otherVehicles) const = 0;
 };
 
