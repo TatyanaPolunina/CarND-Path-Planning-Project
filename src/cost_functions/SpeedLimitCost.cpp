@@ -19,7 +19,7 @@ double SpeedLimitCost::calculateCost(const VehiclePosition &currentState,
         double car_speed = sqrt((x_val - x_prev) * (x_val - x_prev) +
                          (y_val - y_prev) * (y_val - y_prev)) /
                     .02;
-        if (car_speed > m_limit || car_speed < 0)
+        if (car_speed > m_limit + 1 || car_speed < 0)
         {
             return 1;
         }

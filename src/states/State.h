@@ -34,8 +34,6 @@ public:
 protected:
   int getCurrentLane(double d) const;
   double getLaneCenter(int lane_num) const;
-  double m_trajectory_dist = 20;
-  double m_point_interval = 0.02;
   RoadOptions m_options;
 };
 

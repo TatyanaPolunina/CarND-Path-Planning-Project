@@ -11,6 +11,7 @@ struct RoadOptions {
   double speed_limit;
   double max_s;
   double acc_limit;
+  double point_interval;
 
 
   int getLaneNumber(double d) const

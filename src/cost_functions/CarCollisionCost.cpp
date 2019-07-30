@@ -15,7 +15,7 @@ double CarCollisionCost::calculateCost(
   for (const auto &vehicle : otherVehicles) {
     double speed = vehicle.getSpeed();
     double vehicle_s =
-        vehicle.getS() + nextState.size() * 0.02 * vehicle.getSpeed();
+        vehicle.getS() + nextState.size() * m_options.point_interval * vehicle.getSpeed();
     double dist_to_vehicle = vehicle_s - last_pos.getS();
 
     if (m_options.getLaneNumber(last_pos.getD()) ==

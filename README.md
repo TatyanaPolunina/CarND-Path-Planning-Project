@@ -67,20 +67,21 @@ the path has processed since last time.
 
 ## Model documentation
 
-1. The best path is generated inside *TrajectoryGenerator* class based on defined cost function.
-2. *TrajectoryGenerator* initializes all the possible trajectories which may be generated and cost functions to define the best trajectory
-3. All the possible trajectories (states) are generated in classes inherited from the abstract *State* class. Such states are defined:
+1. All the possible trajectories are generated inside *TrajectoryGenerator* class.
+2. Each trajectory (state) is generated in classes inherited from the abstract *State* class. 
+3. Such states are defined:
    * *ChangeSpeedState* - the car stays in the same lane. Depending on acceleration parameter in constructor three different states are initialized by current class: spead increasing, speed decreasing, leave the same speed
    * *ChangeLaneSpeed* - the car move to another lane. Depending on initialization parameters four states are initialized: move to left lane with the same speed, move to left lane with increased speed, and the both for right lane
 4. All the possible cost functions are derived from *CostFunction* abstract class. The cost functions should return the values between 0 and 1. The better state should have the lower cost.
-5. Each cost function has own weight to produce weighted cost functions result inside TrajectoryGenerator. Now two weights are defined:  SAFETY_WEIGHT = 1000 and EFFITIENCY_COST = 100. But it's absolutely possible to define separate weights for separate cost functions. 
+5. Accelerated cost function is calculated inside *BestCostStrategy* class. Inside this strategy each cost function is initialized with own weight. Now two weights are defined:  SAFETY_WEIGHT = 1000 and EFFITIENCY_COST = 100. But it's absolutely possible to define separate weights for separate cost functions. 
 7. Such cost functions are defined now:
    * CarCollisionCost (safety) - check the distance between our car and other cars on the road in current and destination lane
    * SpeedLimitCost (safety) - binary function to check if the speed less than speed limit   
+   * AccelerationLimitCost (safety) - binary function to check if acceleration is under the speed
    * SpeedEfficiencyCost (effitiency) - the better trajectory needs to have bigger final speed
    * PositionEfficiencyCost (effitienct) - ther better trajectory should have bigger S coordinate to reach the goal more quickly
-8. All the possible cost functions with corresponded weights are defined inside  *TrajectoryGenerator* constructor together with all the defined states
-9. Trajectories are generated in frenet coordinates. The transformations to cartesian coordinates are provided inside main.cpp
+8. All the cost functions take current state and possible trajectory in both frenet and cartesian coordinates
+9. Trajectories are generated in frenet coordinates. The transformations to cartesian coordinates are provided inside main.cpp to provide this cost into account
 10. Car angle is taken into account though transformations. Smoothing is done using spline component
 
 

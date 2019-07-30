@@ -32,7 +32,7 @@ int main() {
   double max_s = 6945.554;
 
   // generator which provide the best trajectory based on cost function
-  RoadOptions road_options = {4, 3.0, 50 / 2.237, max_s, 10 / 2.237};
+  RoadOptions road_options = {4, 3.0, 48 / 2.237, max_s, 10 / 2.237, 0.02};
   TrajectoryGenerator generator(road_options);
   BestCostStrategy best_cost_strategy(road_options);
 
@@ -59,9 +59,9 @@ int main() {
   }
 
   h.onMessage([&map_waypoints_x, &map_waypoints_y, &map_waypoints_s,
-               &map_waypoints_dx, &map_waypoints_dy,
-               &generator, &road_options, &best_cost_strategy](uWS::WebSocket<uWS::SERVER> ws, char *data,
-                           size_t length, uWS::OpCode opCode) {
+               &map_waypoints_dx, &map_waypoints_dy, &generator, &road_options,
+               &best_cost_strategy](uWS::WebSocket<uWS::SERVER> ws, char *data,
+                                    size_t length, uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
     // The 4 signifies a websocket message
     // The 2 signifies a websocket event
@@ -121,7 +121,7 @@ int main() {
             double vy = sensor[4];
             double check_speed = sqrt(vx * vx + vy * vy);
             double v_s = sensor[5];
-            v_s += 0.02 * check_speed * prev_size;
+            v_s += road_options.point_interval * check_speed * prev_size;
             other_vehicles.emplace_back(v_s, sensor[6], check_speed);
           }
 
@@ -140,83 +140,96 @@ int main() {
             VehiclePosition current_position(end_path_s, end_path_d, car_speed);
 
             // jenerate the best trajectory
-            const auto trajectories = generator.generate_trajectories({current_position});
-
+            const auto trajectories =
+                generator.generate_trajectories({current_position});
             std::vector<double> best_cost_x;
             std::vector<double> best_cost_y;
             double best_cost = -1;
-            for (const auto& trajectory: trajectories)
-            {
-                std::vector<double> x_vals;
-                std::vector<double> y_vals;
-                //provide spline for correct mapping to x,y coordinates
-                tk::spline spline;
-                std::vector<double> px;
-                std::vector<double> py;
-                //to difficult geometry when lane changing
-                if (prev_size >= 2)
-                {
-                    px.push_back(previous_path_x[prev_size - 2]);
-                    py.push_back(previous_path_y[prev_size - 2]);
-                }
-
-                px.push_back(ref_x);
-                py.push_back(ref_y);
-                auto xy = getXY(trajectory.back().getS(), trajectory.back().getD(),
-                                map_waypoints_s, map_waypoints_x, map_waypoints_y);
-                px.push_back(xy[0]);
-                py.push_back(xy[1]);
-
-                xy = getXY(trajectory.back().getS() + 30, trajectory.back().getD(),
-                           map_waypoints_s, map_waypoints_x, map_waypoints_y);
-                px.push_back(xy[0]);
-                py.push_back(xy[1]);
-                xy = getXY(trajectory.back().getS() + 60, trajectory.back().getD(),
-                           map_waypoints_s, map_waypoints_x, map_waypoints_y);
-                px.push_back(xy[0]);
-                py.push_back(xy[1]);
-
-                for (int i = 0; i < px.size(); i++) {
-
-                  // shift car reference angle to 0 degrees
-                  double shift_x = px[i] - ref_x;
-                  double shift_y = py[i] - ref_y;
-
-                  px[i] = (shift_x * cos(-ref_yaw) - shift_y * sin(-ref_yaw));
-                  py[i] = (shift_x * sin(-ref_yaw) + shift_y * cos(-ref_yaw));
-                }
-
-                spline.set_points(px, py);
-
-                for (const auto &vehiclePosition : trajectory) {
-
-                  double x_point = vehiclePosition.getS() - end_path_s;
-                  double y_point = spline(x_point);
-
-                  double x_ref = x_point;
-                  double y_ref = y_point;
-
-                  x_point = (x_ref * cos(ref_yaw) - y_ref * sin(ref_yaw));
-                  y_point = (x_ref * sin(ref_yaw) + y_ref * cos(ref_yaw));
-
-                  x_point += ref_x;
-                  y_point += ref_y;
-
-                  x_vals.push_back(x_point);
-                  y_vals.push_back(y_point);
-                }
-
-                double cost = best_cost_strategy.calculateCost(current_position, trajectory, x_vals, y_vals,other_vehicles);
-                if (best_cost < 0 || cost < best_cost)
-                {
-                    best_cost = cost;
-                    best_cost_x = std::move(x_vals);
-                    best_cost_y = std::move(y_vals);
-                }
+            int t_index = 0;
+            for (const auto &trajectory : trajectories) {
+              std::vector<double> x_vals;
+              std::vector<double> y_vals;
+              // provide spline for correct mapping to x,y coordinates
+              tk::spline spline;
+              std::vector<double> px;
+              std::vector<double> py;
+              // to difficult geometry when lane changing
+              if (prev_size >=
+                  2) //  and
+                     //  road_options.getLaneNumber(trajectory.back().getD()) !=
+                     //  road_options.getLaneNumber(current_position.getD()))
+              {
+                px.push_back(previous_path_x[prev_size - 2]);
+                py.push_back(previous_path_y[prev_size - 2]);
               }
 
-              std::copy(best_cost_x.begin(), best_cost_x.end(), std::back_inserter(next_x_vals));
-              std::copy(best_cost_y.begin(), best_cost_y.end(), std::back_inserter(next_y_vals));
+              px.push_back(ref_x);
+              py.push_back(ref_y);
+              auto xy =
+                  getXY(trajectory.back().getS(), trajectory.back().getD(),
+                        map_waypoints_s, map_waypoints_x, map_waypoints_y);
+              //      px.push_back(xy[0]);
+              //     py.push_back(xy[1]);
+
+              xy =
+                  getXY(trajectory.back().getS() + 30, trajectory.back().getD(),
+                        map_waypoints_s, map_waypoints_x, map_waypoints_y);
+              px.push_back(xy[0]);
+              py.push_back(xy[1]);
+              xy =
+                  getXY(trajectory.back().getS() + 60, trajectory.back().getD(),
+                        map_waypoints_s, map_waypoints_x, map_waypoints_y);
+              px.push_back(xy[0]);
+              py.push_back(xy[1]);
+
+              for (int i = 0; i < px.size(); i++) {
+
+                // shift car reference angle to 0 degrees
+                double shift_x = px[i] - ref_x;
+                double shift_y = py[i] - ref_y;
+
+                px[i] = (shift_x * cos(-ref_yaw) - shift_y * sin(-ref_yaw));
+                py[i] = (shift_x * sin(-ref_yaw) + shift_y * cos(-ref_yaw));
+              }
+
+              spline.set_points(px, py);
+
+              for (const auto &vehiclePosition : trajectory) {
+
+                double x_point = vehiclePosition.getS() - end_path_s;
+                double y_point = spline(x_point);
+
+                double x_ref = x_point;
+                double y_ref = y_point;
+
+                x_point = (x_ref * cos(ref_yaw) - y_ref * sin(ref_yaw));
+                y_point = (x_ref * sin(ref_yaw) + y_ref * cos(ref_yaw));
+
+                x_point += ref_x;
+                y_point += ref_y;
+
+                x_vals.push_back(x_point);
+                y_vals.push_back(y_point);
+              }
+
+              double cost = best_cost_strategy.calculateCost(
+                  current_position, trajectory, x_vals, y_vals, other_vehicles);
+              /*
+              {
+                  std::cout<<t_index << " " << cost << std::endl;
+              }*/
+              t_index++;
+              if (best_cost < 0 || cost < best_cost) {
+                best_cost = cost;
+                best_cost_x = std::move(x_vals);
+                best_cost_y = std::move(y_vals);
+              }
+            }
+
+            std::copy(best_cost_x.begin(), best_cost_x.end(),
+                      std::back_inserter(next_x_vals));
+            std::copy(best_cost_y.begin(), best_cost_y.end(),
+                      std::back_inserter(next_y_vals));
           }
 
           json msgJson;
